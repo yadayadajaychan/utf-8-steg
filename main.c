@@ -77,6 +77,9 @@ int main(int argc, char *argv[])
 			fpt = fpd;
 			fpd = stdout;
 		}
+	} else {
+		fprintf(stderr, "%s: incorrect number of arguments\n", prog);
+		exit(1);
 	}
 
 
