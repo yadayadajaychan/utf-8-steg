@@ -17,6 +17,7 @@ If one argument is passed, the program will assume if it is data or text based o
 
 ## Compiling
 ```gcc main.c```
+
 Tested on Arch Linux.
 
 ## Encoding
