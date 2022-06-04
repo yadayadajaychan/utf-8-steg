@@ -23,12 +23,15 @@ Tested on Arch Linux.
 ## Encoding
 ```
 Binary encoding: utf-8 hex: Unicode code point: Description
-00: 0xe2808b: U+200B: zero-width space
-01: 0xe2808c: U+200C: zero-width non-joiner
-10: 0xe2808d: U+200D: zero-width joiner
-11: 0xe281a0: U+2060: word joiner
+00: 0xe2 0x80 0x8b: U+200B: zero-width space
+01: 0xe2 0x80 0x8c: U+200C: zero-width non-joiner
+10: 0xe2 0x80 0x8d: U+200D: zero-width joiner
+11: 0xe2 0x81 0xa0: U+2060: word joiner
+
+Delimiter: 0xcd 0x8f: U+034F: Combining Grapheme Joiner
+Magic: 0xe2 0x80 0x8b 0xcd 0x8f
 ```
-These characters are used to encode two bits of data and are inserted into the message.
+These characters are used to encode two bits of data each and are inserted into the message.
 
 ## Limitations
 Each zero-width character takes up 3 bytes but only encodes two bits of data, meaning 12 bytes is going to be needed to encode 1 byte of data. When trying to encode very large files, pasting the text into an application can cause it to hang.
