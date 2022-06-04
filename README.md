@@ -11,9 +11,23 @@ text | steg > data
 ```
 Message refers to the utf-8 text which will be visible to viewers. Data is the data to be encoded into utf-8 characters and inserted into the message. Text is the final product with the data encoded in the message.
 
-If one argument is passed, the program will assume if it is data or text based on whether or not the file contains the magic numbers.
+If no arguments are passed, the program will read text from standard input and output the decoded data to standard output.
+
+If one argument is passed, the program will assume if it is data or text based on whether or not the file contains the magic numbers. If the file is data, the message will be read from standard input and the text will be output to standard output. If the file is text, the data will be decoded and sent to standard output. 
+
+## Compiling
+```gcc main.c```
+Tested on Arch Linux.
+
 ## Encoding
-TODO
+```
+Binary encoding: utf-8 hex: Unicode code point: Description
+00: 0xe2808b: U+200B: zero-width space
+01: 0xe2808c: U+200C: zero-width non-joiner
+10: 0xe2808d: U+200D: zero-width joiner
+11: 0xe281a0: U+2060: word joiner
+```
+These characters are used to encode two bits of data and are inserted into the message.
 
 ## Limitations
 Each zero-width character takes up 3 bytes but only encodes two bits of data, meaning 12 bytes is going to be needed to encode 1 byte of data. When trying to encode very large files, pasting the text into an application can cause it to hang.
