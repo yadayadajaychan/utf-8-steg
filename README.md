@@ -15,6 +15,11 @@ If no arguments are passed, the program will read text from standard input and o
 
 If one argument is passed, the program will assume if it is data or text based on whether or not the file contains the magic numbers. If the file is data, the message will be read from standard input and the text will be output to standard output. If the file is text, the data will be decoded and sent to standard output. 
 
+## Installing
+This program is available in the AUR as [utf-8-steg-git](https://aur.archlinux.org/pkgbase/utf-8-steg-git).
+
+To install using an AUR helper, run `yay -S utf-8-steg-git`
+
 ## Compiling
 ```gcc main.c```
 
