@@ -1,5 +1,5 @@
 # utf-8-steg
-encodes data into zero-width utf-8 characters
+encodes/decodes data into zero-width utf-8 characters
 
 This is currently an early prototype and needs a lot of polishing
 ## Usage
