@@ -38,6 +38,8 @@ Each zero-width character takes up 3 bytes but only encodes two bits of data, me
 
 This may be common sense, but the message can not contain any of the utf-8 characters used to encode the data. 
 ## TODO
+- [ ] Command line options
+- [ ] Manual page
 - [ ] Add checksum to verify data integrity
 - [ ] Better error handling
 
