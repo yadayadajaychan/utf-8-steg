@@ -39,11 +39,13 @@ Magic: 0xe2 0x80 0x8b 0xcd 0x8f
 These characters are used to encode two bits of data each and are inserted into the message.
 
 ## Limitations
+This program currently can't parse the argument '-' as stdin/stdout and opens files read-only.
+
 Each zero-width character takes up 3 bytes but only encodes two bits of data, meaning 12 bytes is going to be needed to encode 1 byte of data. When trying to encode very large files, pasting the text into an application can cause it to hang.
 
 This may be common sense, but the message can not contain any of the utf-8 characters used to encode the data. 
 ## TODO
-- [ ] Command line options
+- [x] Command line options
 - [ ] Manual page
 - [ ] Add checksum to verify data integrity
 - [ ] Better error handling
