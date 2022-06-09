@@ -15,6 +15,7 @@ Message refers to the utf-8 text which will be visible to viewers. Data is the d
 
 `-e` or `-c` can be used to specify "encode" and `-x` is used to specify "decode".
 `-m` is for the message file, `-d` is for the data file, and `-t` is for the text file. This program can not currently write its output to a file as it opens them read-only.
+`-v` is for verbose output and specifying it twice, `-vv`, makes it more verbose.
 
 ## Installing
 This program is available in the AUR as [utf-8-steg-git](https://aur.archlinux.org/pkgbase/utf-8-steg-git).
