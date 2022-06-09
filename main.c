@@ -33,6 +33,7 @@ int checkbit (char data, int bit);
 int checkbytes (char data);
 
 char *prog;
+int verbose = 0;
 static const char magic[] = {0xe2, 0x80, 0x8b, 0xcd, 0x8f, 0};
 int main(int argc, char *argv[])
 {
@@ -40,7 +41,7 @@ int main(int argc, char *argv[])
 	FILE *fpt = NULL; /* file pointer to text */
 	FILE *fpm = NULL; /* file pointer to message */
 	prog = argv[0]; /* Program name for errors */
-	int encode = -1, verbose = 0, opt;
+	int encode = -1, opt;
 
 	/* command line option parsing */
 	while ( (opt = getopt(argc, argv, "cexd:m:t:v")) != -1 ) {
@@ -80,7 +81,7 @@ int main(int argc, char *argv[])
                         }
                         break;
 		case 'v':
-			verbose = 1;
+			++verbose;
 			break;
                 default:
                         exit(1);
@@ -171,10 +172,10 @@ int main(int argc, char *argv[])
 	//fprintf(stderr, "The value of encode is %d\n", encode);
 
 	if (encode == 1) {
-		if (verbose) { fprintf(stderr, "Encoding data...\n"); }
+		if (verbose) { fprintf(stderr, "%s: Encoding data...\n", prog); }
 		encode_data(fpm, fpd, fpt);
 	} else if (encode == 0) {
-		if (verbose) { fprintf(stderr, "Decoding data...\n"); }
+		if (verbose) { fprintf(stderr, "%s: Decoding data...\n", prog); }
 		decode_data(fpd, fpt);
 	} else {
 		fprintf(stderr, "Encode value is not set\n");
@@ -272,7 +273,7 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 		fprintf(stderr, "%s: Size of data file is zero, no data to encode\n", prog);
 		exit(1);
 	}
-	fprintf(stderr, "Data size: %d\n", data_file_size);
+	if (verbose) { fprintf(stderr, "%s: Data size: %i\n", prog, data_file_size); }
 
 
 	size_t i = 0, n = 32;
@@ -312,14 +313,14 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 		exit(1);
 	}
 	size_t number_of_characters = n;
-	fprintf(stderr, "Number of characters: %d\n", number_of_characters);
+	if (verbose) { fprintf(stderr, "%s: Number of characters: %zu\n", prog, number_of_characters); }
 	size_t number_of_spaces = (n - 2);
-	fprintf(stderr, "Number of usable spaces: %d\n", number_of_spaces);
+	if (verbose) { fprintf(stderr, "%s: Number of usable spaces: %zu\n", prog, number_of_spaces); }
 	
 	/* calculates the number of bytes to put in each space */
 	unsigned long long int bytes_per_space;
 	bytes_per_space = ( data_file_size + (number_of_spaces - 1) ) / number_of_spaces;
-        fprintf(stderr, "Bytes per space: %llu\n", bytes_per_space);
+        if (verbose) { fprintf(stderr, "%s: Bytes per space: %llu\n", prog, bytes_per_space); }
 
 
 	unsigned char data;
