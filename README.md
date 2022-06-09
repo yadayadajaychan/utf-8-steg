@@ -6,7 +6,7 @@ This is currently an early prototype and needs a lot of polishing
 ```
 Examples:
 message | steg -ed data > text
-data | steg -em message > text
+data | steg -em message > text (not implemented yet)
 steg -ed data -m message > text
 steg -xt text > data
 text | steg -x > data
@@ -40,7 +40,7 @@ Magic: 0xe2 0x80 0x8b 0xcd 0x8f
 These characters are used to encode two bits of data each and are inserted into the message.
 
 ## Limitations
-This program currently can't parse the argument '-' as stdin/stdout and opens files read-only.
+This program currently can't parse the argument '-' as stdin/stdout and can't read data from stdin.
 
 Each zero-width character takes up 3 bytes but only encodes two bits of data, meaning 12 bytes is going to be needed to encode 1 byte of data. When trying to encode very large files, pasting the text into an application can cause it to hang.
 
