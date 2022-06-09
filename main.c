@@ -54,27 +54,21 @@ int main(int argc, char *argv[])
                         encode = 0;
                         break;
                 case 'd':
-			if (optarg == "-") {
-				fpd = stdin;
-			} else if ( (fpd = fopen(optarg, "r")) == NULL ) {
+			if ( (fpd = fopen(optarg, "r")) == NULL ) {
                         	fprintf(stderr, "%s: cannot access '%s': ", prog, optarg);
                         	perror("");
                         	exit(errno);
                 	}
                         break;
                 case 'm':
-			if (optarg == "-") {
-				fpm = stdin;
-			} else if ( (fpm = fopen(optarg, "r")) == NULL ) {
+			if ( (fpm = fopen(optarg, "r")) == NULL ) {
                                 fprintf(stderr, "%s: cannot access '%s': ", prog, optarg);
                                 perror("");
                                 exit(errno);
                         }
                         break;
                 case 't':
-			if (optarg == "-") {
-				fpt = stdin;
-			} else if ( (fpt = fopen(optarg, "r")) == NULL ) {
+			if ( (fpt = fopen(optarg, "r")) == NULL ) {
                                 fprintf(stderr, "%s: cannot access '%s': ", prog, optarg);
                                 perror("");
                                 exit(errno);
@@ -91,14 +85,6 @@ int main(int argc, char *argv[])
 	if ( encode == -1 ) {
 		fprintf(stderr, "%s: No action specified\n", prog);
 		exit(1);
-	}
-
-	/* correcting use of "-" as standard input */
-	if ( encode == 1 && fpt == stdin ) {
-		fpt = stdout;
-	}
-	if ( encode == 0 && fpd == stdin ) {
-		fpd = stdout;
 	}
 
 	/* handles missing options */
@@ -140,7 +126,7 @@ int main(int argc, char *argv[])
 	} else if (encode == 0) {
 
 		/* check magic numbers */
-		if (verbose == 2) { fprintf(stderr, "%s: Checking magic numbers...\n", prog); }
+		if (verbose > 1) { fprintf(stderr, "%s: Checking magic numbers...\n", prog); }
 		if ( !magic_number(fpt) ) {
 			if (verbose) { fprintf(stderr, "%s: Decoding data...\n", prog); }
 			decode_data(fpd, fpt);
@@ -245,7 +231,7 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 		fprintf(stderr, "%s: Size of data file is zero, no data to encode\n", prog);
 		exit(1);
 	}
-	if (verbose) { fprintf(stderr, "%s: Data size: %i\n", prog, data_file_size); }
+	if (verbose > 1) { fprintf(stderr, "%s: Data size: %i\n", prog, data_file_size); }
 
 
 	size_t i = 0, n = 32;
@@ -285,14 +271,14 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 		exit(1);
 	}
 	size_t number_of_characters = n;
-	if (verbose) { fprintf(stderr, "%s: Number of characters: %zu\n", prog, number_of_characters); }
+	if (verbose > 1) { fprintf(stderr, "%s: Number of characters: %zu\n", prog, number_of_characters); }
 	size_t number_of_spaces = (n - 2);
-	if (verbose) { fprintf(stderr, "%s: Number of usable spaces: %zu\n", prog, number_of_spaces); }
+	if (verbose > 1) { fprintf(stderr, "%s: Number of usable spaces: %zu\n", prog, number_of_spaces); }
 	
 	/* calculates the number of bytes to put in each space */
 	unsigned long long int bytes_per_space;
 	bytes_per_space = ( data_file_size + (number_of_spaces - 1) ) / number_of_spaces;
-        if (verbose) { fprintf(stderr, "%s: Bytes per space: %llu\n", prog, bytes_per_space); }
+        if (verbose > 1) { fprintf(stderr, "%s: Bytes per space: %llu\n", prog, bytes_per_space); }
 
 
 	unsigned char data;
