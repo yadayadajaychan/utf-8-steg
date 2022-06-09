@@ -106,12 +106,12 @@ int main(int argc, char *argv[])
 		if (fpt == NULL) {
 			fpt = stdout;
 		}
+		if ( fpd == NULL && fpm == NULL ) {
+			fprintf(stderr, "%s: Need to specify either data file, message file, or both in encode mode\n", prog);
+			exit(1);
+		}
 		if (fpd == NULL) {
-			if (fpm == NULL) {
-				;
-			} else {
-				fpd = stdin;
-			}
+			fpd = stdin;
 		}
 		if (fpm == NULL) {
 			fpm = stdin;
@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
                         fpd = stdout;
                 }
                 if (fpm != NULL) {
-			fprintf(stderr, "%s: Ignoring message because currently in decode mode\n", prog);
+			fprintf(stderr, "%s: Ignoring message file because currently in decode mode\n", prog);
                         fpm = NULL;
                 }
 	}
@@ -136,12 +136,22 @@ int main(int argc, char *argv[])
 	if (encode == 1) {
 		if (verbose) { fprintf(stderr, "%s: Encoding data...\n", prog); }
 		encode_data(fpm, fpd, fpt);
+
 	} else if (encode == 0) {
 		if (verbose) { fprintf(stderr, "%s: Decoding data...\n", prog); }
-		decode_data(fpd, fpt);
+
+		/* check magic numbers */
+		if (verbose == 2) { fprintf(stderr, "%s: Checking magic numbers...\n", prog); }
+		if ( !magic_number(fpt) ) {
+			decode_data(fpd, fpt);
+		} else {
+			fprintf(stderr, "%s: text stream does not contain magic numbers\n", prog);
+			exit(2);
+		}
+
 	} else {
 		fprintf(stderr, "Encode value is not set\n");
-		exit(1);
+		exit(2);
 	}
 
 	exit(0);
