@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 			if (optarg == "-") {
 				fpd = stdin;
 			} else if ( (fpd = fopen(optarg, "r")) == NULL ) {
-                        	fprintf(stderr, "%s: cannot access '%s': ", prog, argv[1]);
+                        	fprintf(stderr, "%s: cannot access '%s': ", prog, optarg);
                         	perror("");
                         	exit(errno);
                 	}
@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
 			if (optarg == "-") {
 				fpm = stdin;
 			} else if ( (fpm = fopen(optarg, "r")) == NULL ) {
-                                fprintf(stderr, "%s: cannot access '%s': ", prog, argv[1]);
+                                fprintf(stderr, "%s: cannot access '%s': ", prog, optarg);
                                 perror("");
                                 exit(errno);
                         }
@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
 			if (optarg == "-") {
 				fpt = stdin;
 			} else if ( (fpt = fopen(optarg, "r")) == NULL ) {
-                                fprintf(stderr, "%s: cannot access '%s': ", prog, argv[1]);
+                                fprintf(stderr, "%s: cannot access '%s': ", prog, optarg);
                                 perror("");
                                 exit(errno);
                         }
@@ -87,6 +87,11 @@ int main(int argc, char *argv[])
                         exit(1);
                 }
         }
+
+	if ( encode == -1 ) {
+		fprintf(stderr, "%s: No action specified\n", prog);
+		exit(1);
+	}
 
 	/* correcting use of "-" as standard input */
 	if ( encode == 1 && fpt == stdin ) {
@@ -103,12 +108,7 @@ int main(int argc, char *argv[])
 		}
 		if (fpd == NULL) {
 			if (fpm == NULL) {
-				if ( (fpd = fopen(argv[optind], "r")) == NULL ) {
-                                	fprintf(stderr, "%s: cannot access '%s': ", prog, argv[1]);
-                                	perror("");
-                                	exit(errno);
-                                }
-
+				;
 			} else {
 				fpd = stdin;
 			}
@@ -129,44 +129,6 @@ int main(int argc, char *argv[])
                         fpm = NULL;
                 }
 	}
-
-	//if (argc == 1) {
-	//	fpt = stdin;
-	//	if (verbose) { fprintf(stderr, "%s: Assuming stdin is text\n", prog); }
-	//	if ( !magic_number(fpt) ) {
-	//		encode = 0;
-	//		fpd = stdout;
-	//	} else {
-	//		fprintf(stderr, "%s: stdin does not contain magic numbers\n", prog);
-	//		exit(2);
-	//	}
-
-	//} else if (argc == 2) {
-	//	if ( (fpd = fopen(argv[1], "r")) == NULL ) {
-	//		fprintf(stderr, "%s: cannot access '%s': ", prog, argv[1]);
-	//		perror("");
-	//		exit(errno);
-	//	}
-	//	if ( encode = magic_number(fpd) ) {
-	//		if ( fseek(fpd, 0L, SEEK_SET) != 0 ) {
-	//			fprintf(stderr, "%s: error resetting file pointer: ", prog);
-	//			perror("");
-	//			exit(errno);
-	//		}
-	//		
-	//		fprintf(stderr, "Assuming file given is data\n");
-	//		fpm = stdin;
-	//		fpt = stdout;
-	//	} else {
-	//		fprintf(stderr, "Assuming file given is text\n");
-	//		fpt = fpd;
-	//		fpd = stdout;
-	//	}
-	//} else {
-	//	fprintf(stderr, "%s: incorrect number of arguments\n", prog);
-	//	exit(1);
-	//}
-
 
 
 	//fprintf(stderr, "The value of encode is %d\n", encode);
