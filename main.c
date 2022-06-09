@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <unistd.h>
 
 /* Parses through the first 9 bytes of stream for magic number (does not reset stream)
  * Arguments: file pointer
@@ -35,63 +36,149 @@ char *prog;
 static const char magic[] = {0xe2, 0x80, 0x8b, 0xcd, 0x8f, 0};
 int main(int argc, char *argv[])
 {
-	FILE *fpd; /* file pointer to data */
-	FILE *fpt; /* file pointer to text */
-	FILE *fpm; /* file pointer to message */
+	FILE *fpd = NULL; /* file pointer to data */
+	FILE *fpt = NULL; /* file pointer to text */
+	FILE *fpm = NULL; /* file pointer to message */
 	prog = argv[0]; /* Program name for errors */
-	int encode;
+	int encode = -1, verbose = 0, opt;
 
-	/* TODO: Add command line option parsing here */
-	if (argc == 1) {
-		//fprintf(stderr, "%s: No file(s) specified\n", prog);
-		//exit(22);
+	/* command line option parsing */
+	while ( (opt = getopt(argc, argv, "cexd:m:t:v")) != -1 ) {
+                switch (opt) {
+		case 'c':
+                case 'e':
+                        encode = 1;
+                        break;
+                case 'x':
+                        encode = 0;
+                        break;
+                case 'd':
+			if (optarg == "-") {
+				fpd = stdin;
+			} else if ( (fpd = fopen(optarg, "r")) == NULL ) {
+                        	fprintf(stderr, "%s: cannot access '%s': ", prog, argv[1]);
+                        	perror("");
+                        	exit(errno);
+                	}
+                        break;
+                case 'm':
+			if (optarg == "-") {
+				fpm = stdin;
+			} else if ( (fpm = fopen(optarg, "r")) == NULL ) {
+                                fprintf(stderr, "%s: cannot access '%s': ", prog, argv[1]);
+                                perror("");
+                                exit(errno);
+                        }
+                        break;
+                case 't':
+			if (optarg == "-") {
+				fpt = stdin;
+			} else if ( (fpt = fopen(optarg, "r")) == NULL ) {
+                                fprintf(stderr, "%s: cannot access '%s': ", prog, argv[1]);
+                                perror("");
+                                exit(errno);
+                        }
+                        break;
+		case 'v':
+			verbose = 1;
+			break;
+                default:
+                        exit(1);
+                }
+        }
 
-		fpt = stdin;
-		if ( !magic_number(fpt) ) {
-			fprintf(stderr, "%s: Assuming stdin is text\n", prog);
-			encode = 0;
-			fpd = stdout;
-		} else {
-			fprintf(stderr, "%s: stdin does not contain magic numbers\n", prog);
-			exit(2);
-		}
-
-	} else if (argc == 2) {
-		if ( (fpd = fopen(argv[1], "r")) == NULL ) {
-			fprintf(stderr, "%s: cannot access '%s': ", prog, argv[1]);
-			perror("");
-			exit(errno);
-		}
-		if ( encode = magic_number(fpd) ) {
-			if ( fseek(fpd, 0L, SEEK_SET) != 0 ) {
-				fprintf(stderr, "%s: error resetting file pointer: ", prog);
-				perror("");
-				exit(errno);
-			}
-			
-			fprintf(stderr, "Assuming file given is data\n");
-			fpm = stdin;
-			fpt = stdout;
-		} else {
-			fprintf(stderr, "Assuming file given is text\n");
-			fpt = fpd;
-			fpd = stdout;
-		}
-	} else {
-		fprintf(stderr, "%s: incorrect number of arguments\n", prog);
-		exit(1);
+	/* correcting use of "-" as standard input */
+	if ( encode == 1 && fpt == stdin ) {
+		fpt = stdout;
+	}
+	if ( encode == 0 && fpd == stdin ) {
+		fpd = stdout;
 	}
 
+	/* handles missing options */
+	if ( encode == 1 ) {
+		if (fpt == NULL) {
+			fpt = stdout;
+		}
+		if (fpd == NULL) {
+			if (fpm == NULL) {
+				if ( (fpd = fopen(argv[optind], "r")) == NULL ) {
+                                	fprintf(stderr, "%s: cannot access '%s': ", prog, argv[1]);
+                                	perror("");
+                                	exit(errno);
+                                }
+
+			} else {
+				fpd = stdin;
+			}
+		}
+		if (fpm == NULL) {
+			fpm = stdin;
+		}
+	}
+	if ( encode == 0 ) {
+		if (fpt == NULL) {
+                        fpt = stdin;
+                }
+                if (fpd == NULL) {
+                        fpd = stdout;
+                }
+                if (fpm != NULL) {
+			fprintf(stderr, "%s: Ignoring message because currently in decode mode\n", prog);
+                        fpm = NULL;
+                }
+	}
+
+	//if (argc == 1) {
+	//	fpt = stdin;
+	//	if (verbose) { fprintf(stderr, "%s: Assuming stdin is text\n", prog); }
+	//	if ( !magic_number(fpt) ) {
+	//		encode = 0;
+	//		fpd = stdout;
+	//	} else {
+	//		fprintf(stderr, "%s: stdin does not contain magic numbers\n", prog);
+	//		exit(2);
+	//	}
+
+	//} else if (argc == 2) {
+	//	if ( (fpd = fopen(argv[1], "r")) == NULL ) {
+	//		fprintf(stderr, "%s: cannot access '%s': ", prog, argv[1]);
+	//		perror("");
+	//		exit(errno);
+	//	}
+	//	if ( encode = magic_number(fpd) ) {
+	//		if ( fseek(fpd, 0L, SEEK_SET) != 0 ) {
+	//			fprintf(stderr, "%s: error resetting file pointer: ", prog);
+	//			perror("");
+	//			exit(errno);
+	//		}
+	//		
+	//		fprintf(stderr, "Assuming file given is data\n");
+	//		fpm = stdin;
+	//		fpt = stdout;
+	//	} else {
+	//		fprintf(stderr, "Assuming file given is text\n");
+	//		fpt = fpd;
+	//		fpd = stdout;
+	//	}
+	//} else {
+	//	fprintf(stderr, "%s: incorrect number of arguments\n", prog);
+	//	exit(1);
+	//}
 
 
-	fprintf(stderr, "The value of encode is %d\n", encode);
 
-	if (encode) {
-		fprintf(stderr, "Encode is true\n");
+	//fprintf(stderr, "The value of encode is %d\n", encode);
+
+	if (encode == 1) {
+		if (verbose) { fprintf(stderr, "Encoding data...\n"); }
 		encode_data(fpm, fpd, fpt);
-	} else {
-		fprintf(stderr, "encode is false\n");
+	} else if (encode == 0) {
+		if (verbose) { fprintf(stderr, "Decoding data...\n"); }
 		decode_data(fpd, fpt);
+	} else {
+		fprintf(stderr, "Encode value is not set\n");
+		exit(1);
 	}
 
 	exit(0);
