@@ -48,6 +48,7 @@ This may be common sense, but the message can not contain any of the utf-8 chara
 ## TODO
 - [x] Command line options
 - [ ] Manual page
+- [ ] Read data from stdin
 - [ ] Add checksum to verify data integrity
 - [ ] Better error handling
 
