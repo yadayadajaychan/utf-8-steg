@@ -3,17 +3,18 @@ encodes/decodes data into zero-width utf-8 characters
 
 This is currently an early prototype and needs a lot of polishing
 ## Usage
-I need to add command line option parsing, but for now, this is the basic format
 ```
-message | steg data > text
-steg text > data
-text | steg > data
+Examples:
+message | steg -ed data > text
+data | steg -em message > text
+steg -ed data -m message > text
+steg -xt text > data
+text | steg -x > data
 ```
 Message refers to the utf-8 text which will be visible to viewers. Data is the data to be encoded into utf-8 characters and inserted into the message. Text is the final product with the data encoded in the message.
 
-If no arguments are passed, the program will read text from standard input and output the decoded data to standard output.
-
-If one argument is passed, the program will assume if it is data or text based on whether or not the file contains the magic numbers. If the file is data, the message will be read from standard input and the text will be output to standard output. If the file is text, the data will be decoded and sent to standard output. 
+`-e` or `-c` can be used to specify "encode" and `-x` is used to specify "decode".
+`-m` is for the message file, `-d` is for the data file, and `-t` is for the text file. This program can not currently write its output to a file as it opens them read-only.
 
 ## Installing
 This program is available in the AUR as [utf-8-steg-git](https://aur.archlinux.org/pkgbase/utf-8-steg-git).
