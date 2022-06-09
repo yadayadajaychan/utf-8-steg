@@ -138,11 +138,11 @@ int main(int argc, char *argv[])
 		encode_data(fpm, fpd, fpt);
 
 	} else if (encode == 0) {
-		if (verbose) { fprintf(stderr, "%s: Decoding data...\n", prog); }
 
 		/* check magic numbers */
 		if (verbose == 2) { fprintf(stderr, "%s: Checking magic numbers...\n", prog); }
 		if ( !magic_number(fpt) ) {
+			if (verbose) { fprintf(stderr, "%s: Decoding data...\n", prog); }
 			decode_data(fpd, fpt);
 		} else {
 			fprintf(stderr, "%s: text stream does not contain magic numbers\n", prog);
