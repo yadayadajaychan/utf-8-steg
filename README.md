@@ -5,11 +5,17 @@ This is currently an early prototype and needs a lot of polishing
 ## Usage
 ```
 Examples:
-message | steg -ed data > text
-data | steg -em message > text (not implemented yet)
-steg -ed data -m message > text
-steg -xt text > data
-text | steg -x > data
+$ utf-8-steg -ed data
+Encodes data from file named "data", reads message from stdin, and outputs text to stdout
+
+$ utf-8-steg -ed data -m message
+Encodes data from file named "data", reads message from file named "message", and outputs text to stdout
+
+$ utf-8-steg -xt text
+Reads text from file named "text" and outputs the decoded data to stdout
+
+$ utf-8-steg -x
+Reads text from stdin and outputs the decoded data to stdout
 ```
 Message refers to the utf-8 text which will be visible to viewers. Data is the data to be encoded into utf-8 characters and inserted into the message. Text is the final product with the data encoded in the message.
 
