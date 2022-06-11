@@ -126,9 +126,9 @@ int main(int argc, char *argv[])
 	} else if (encode == 0) {
 
 		/* check magic numbers */
+		if (verbose) { fprintf(stderr, "%s: Decoding data...\n", prog); }
 		if (verbose > 1) { fprintf(stderr, "%s: Checking magic numbers...\n", prog); }
 		if ( !magic_number(fpt) ) {
-			if (verbose) { fprintf(stderr, "%s: Decoding data...\n", prog); }
 			decode_data(fpd, fpt);
 		} else {
 			fprintf(stderr, "%s: text stream does not contain magic numbers\n", prog);
