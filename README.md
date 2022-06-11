@@ -2,6 +2,9 @@
 encodes/decodes data into zero-width utf-8 characters
 
 This is currently an early prototype and needs a lot of polishing
+## Demo
+t​͏‌⁠‌​r‌‍‍​y‌‍‍‌ ‌⁠​⁠u​‍​​s‌‍‍‌i‌⁠​⁠n​‍​​g‌‍​‌ ​‍​​t‌⁠​⁠h‌‍‌‌i‌‍​⁠s‌⁠​‍ ‌‍‌‌p‌⁠‌​r​‍​​o‌‍⁠‌g‌‍‌‌r‌⁠​⁠a‌⁠​⁠m‌‍​‌ ‌‍‌⁠t‌‍‌‌o​​‍‍ decode the data hidden in this message
+
 ## Usage
 ```
 Examples:
