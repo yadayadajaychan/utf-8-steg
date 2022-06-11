@@ -1,0 +1,73 @@
+.\" Manpage for utf-8-steg
+.TH UTF-8-STEG 1 2022-06-10 "utf-8-steg 0.1.0" "User Commands"
+.SH NAME
+utf-8-steg \- encodes/decodes data into zero-width utf-8 characters
+.SH SYNOPSIS
+.PP
+\fButf-8-steg\fR {\fB\-e\fR|\fB\-c\fR} \fB\-d\fR \fIdata\fR [\fB\-m\fR \fImessage\fR]
+.PP
+\fButf-8-steg\fR \fB\-x\fR [\fB\-t\fR \fItext\fR]
+.SH DESCRIPTION
+.PP
+\fButf-8-steg\fR is a program for encoding arbritary data into zero-width utf-8 characters and decoding it back. These zero-width characters are not rendered as visible chracters and can be used to hide data. 
+.PP
+\fImessage\fR refers to the utf-8 text which will be visible to viewers. \fIdata\fR is the data to be encoded into zero-width utf-8 characters and inserted into the \fImessage\fR. \fItext\fR is the final product with the \fIdata\fR encoded in the \fImessage\fR.
+.SH OPTIONS
+.SS Operation mode
+These options tell \fButf-8-steg\fR what operation to perform.
+.TP 
+\fB\-e\fR, \fB\-c\fR
+In encode mode, \fButf-8-steg\fR takes \fIdata\fR, encodes it into zero-width characters, and inserts it into \fImessage\fR. The resulting \fItext\fR is sent to standard output.
+.TP
+\fB\-x\fR
+In decode mode, \fButf-8-steg\fR takes \fItext\fR, decodes the \fIdata\fR, and sends it to standard output.
+.SS File selection
+These options specify which files to read from. If not specified, \fButf-8-steg\fR reads from standard input.
+.TP
+\fB\-d\fR
+Specifies the data file to read from.
+.TP
+\fB\-m\fR
+Specifies the message file to read from.
+.TP
+\fB\-t\fR
+Specifies the text file to read from.
+.SH EXIT STATUS
+.TP
+\fB0\fR
+Success
+.TP
+\fB1\fR
+Minor errors
+.TP
+\fB2\fR
+Major errors
+.SH NOTES
+.PP
+This program currently can\'t parse the argument \'\-\' as stdin/stdout and can't read \fIdata\fR from stdin.
+.PP
+Each zero-width character takes up 3 bytes but only encodes two bits of data, meaning 12 bytes is going to be needed to encode 1 byte of data.
+.PP
+\fImessage\fR can not contain any of the utf-8 characters used to encode the data, namely U+200B, U+200C, U+200D, U+2060, and U+034F.
+.SH BUGS
+Report bugs to https://github.com/yadayadajaychan/utf-8-steg/issues
+.SH EXAMPLES
+\fB$ utf-8-steg -ed data\fR
+.PP
+Encodes data from file named "data", reads message from stdin, and outputs text to stdout
+
+\fB$ utf-8-steg -ed data -m message\fR
+.PP
+Encodes data from file named "data", reads message from file named "message", and outputs text to stdout
+
+\fB$ utf-8-steg -xt text\fR
+.PP
+Reads text from file named "text" and outputs the decoded data to stdout
+
+\fB$ utf-8-steg -x\fR
+.PP
+Reads text from stdin and outputs the decoded data to stdout
+.SH AUTHOR
+This manual page was written by Ethan Cheng <ethanrc0528@gmail.com>
+.SH SEE ALSO
+Project page: https://github.com/yadayadajaychan/utf-8-steg
