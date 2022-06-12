@@ -1,10 +1,10 @@
 .\" Manpage for utf-8-steg
-.TH UTF-8-STEG 1 2022-06-10 "utf-8-steg 0.1.1" "User Commands"
+.TH UTF-8-STEG 1 2022-06-11 "utf-8-steg 0.1.2" "User Commands"
 .SH NAME
 utf-8-steg \- encodes/decodes data into zero-width utf-8 characters
 .SH SYNOPSIS
 .PP
-\fButf-8-steg\fR {\fB\-e\fR|\fB\-c\fR} \fB\-d\fR \fIdata\fR [\fB\-m\fR \fImessage\fR]
+\fButf-8-steg\fR {\fB\-e\fR|\fB\-c\fR} [\fB\-d\fR \fIdata\fR] [\fB\-m\fR \fImessage\fR]
 .PP
 \fButf-8-steg\fR \fB\-x\fR [\fB\-t\fR \fItext\fR]
 .SH DESCRIPTION
@@ -48,7 +48,7 @@ Minor errors
 Major errors
 .SH NOTES
 .PP
-This program currently can\'t parse the argument \'\-\' as stdin/stdout and can't read \fIdata\fR from stdin.
+This program currently can\'t parse the argument \'\-\' as stdin/stdout.
 .PP
 Each zero-width character takes up 3 bytes but only encodes two bits of data, meaning 12 bytes is going to be needed to encode 1 byte of data.
 .PP
@@ -59,6 +59,10 @@ Report bugs to https://github.com/yadayadajaychan/utf-8-steg/issues
 \fB$ utf-8-steg -ed data\fR
 .PP
 Encodes data from file named "data", reads message from stdin, and outputs text to stdout
+
+\fB$ utf-8-steg -em message\fR
+.PP
+Encodes data from stdin, reads message from file named "message", and outputs text to stdout
 
 \fB$ utf-8-steg -ed data -m message\fR
 .PP

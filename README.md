@@ -7,7 +7,7 @@ t​͏‌⁠‌​r‌‍‍​y‌‍‍‌ ‌⁠​⁠u​‍​​s‌‍‍
 
 ## Usage
 ```
-TF-8-STEG(1)                    User Commands                   UTF-8-STEG(1)
+UTF-8-STEG(1)                    User Commands                   UTF-8-STEG(1)
 
 
 
@@ -15,7 +15,7 @@ NAME
        utf-8-steg - encodes/decodes data into zero-width utf-8 characters
 
 SYNOPSIS
-       utf-8-steg {-e|-c} -d data [-m message]
+       utf-8-steg {-e|-c} [-d data] [-m message]
 
        utf-8-steg -x [-t text]
 
@@ -62,13 +62,12 @@ EXIT STATUS
        2      Major errors
 
 NOTES
-       This program currently can't parse the argument '-' as stdin/stdout and
-       can't read data from stdin.
+       This program currently can't parse the argument '-' as stdin/stdout.
 
        Each zero-width character takes up 3 bytes but only encodes two bits of
        data, meaning 12 bytes is going to be needed to encode 1 byte of data.
 
-       message  can not contain any of the utf-8 characters used to encode the
+       message can not contain any of the utf-8 characters used to encode  the
        data, namely U+200B, U+200C, U+200D, U+2060, and U+034F.
 
 BUGS
@@ -79,6 +78,11 @@ EXAMPLES
 
        Encodes data from file named "data", reads message from stdin, and out-
        puts text to stdout
+
+       $ utf-8-steg -em message
+
+       Encodes data from stdin, reads message from file named  "message",  and
+       outputs text to stdout
 
        $ utf-8-steg -ed data -m message
 
@@ -102,7 +106,7 @@ SEE ALSO
 
 
 
-utf-8-steg 0.1.1                  2022-06-10                     UTF-8-STEG(1)
+utf-8-steg 0.1.2                  2022-06-11                     UTF-8-STEG(1)
 ```
 ## Installing
 This program is available in the AUR as [utf-8-steg-git](https://aur.archlinux.org/pkgbase/utf-8-steg-git).
@@ -136,7 +140,7 @@ This may be common sense, but the message can not contain any of the utf-8 chara
 ## TODO
 - [x] Command line options
 - [x] Manual page
-- [ ] Read data from stdin
+- [x] Read data from stdin
 - [ ] Add checksum to verify data integrity
 - [ ] Better error handling
 
