@@ -62,12 +62,15 @@ EXIT STATUS
        2      Major errors
 
 NOTES
-       This program currently can't parse the argument '-' as stdin/stdout.
+       This program currently can't parse the argument '-' as stdin/stdout. If
+       data is read from stdin in encode mode, utf-8-steg will not spread  out
+       the  encoded  data  in the message because it can't get the size of the
+       input stream.
 
        Each zero-width character takes up 3 bytes but only encodes two bits of
        data, meaning 12 bytes is going to be needed to encode 1 byte of data.
 
-       message can not contain any of the utf-8 characters used to encode  the
+       message  can not contain any of the utf-8 characters used to encode the
        data, namely U+200B, U+200C, U+200D, U+2060, and U+034F.
 
 BUGS
@@ -81,17 +84,17 @@ EXAMPLES
 
        $ utf-8-steg -em message
 
-       Encodes data from stdin, reads message from file named  "message",  and
+       Encodes  data  from stdin, reads message from file named "message", and
        outputs text to stdout
 
        $ utf-8-steg -ed data -m message
 
-       Encodes  data  from  file  named  "data", reads message from file named
+       Encodes data from file named "data",  reads  message  from  file  named
        "message", and outputs text to stdout
 
        $ utf-8-steg -xt text
 
-       Reads text from file named "text" and outputs the decoded data to  std-
+       Reads  text from file named "text" and outputs the decoded data to std-
        out
 
        $ utf-8-steg -x
@@ -106,7 +109,7 @@ SEE ALSO
 
 
 
-utf-8-steg 0.1.2                  2022-06-11                     UTF-8-STEG(1)
+utf-8-steg 0.1.2                  2022-06-12                     UTF-8-STEG(1)
 ```
 ## Installing
 This program is available in the AUR as [utf-8-steg-git](https://aur.archlinux.org/pkgbase/utf-8-steg-git).
