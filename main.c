@@ -117,8 +117,6 @@ int main(int argc, char *argv[])
 	}
 
 
-	//fprintf(stderr, "The value of encode is %d\n", encode);
-
 	if (encode == 1) {
 		if (verbose) { fprintf(stderr, "%s: Encoding data...\n", prog); }
 		encode_data(fpm, fpd, fpt);
@@ -206,33 +204,34 @@ int magic_number (FILE *fp)
 
 void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 {
-	/* check size of data file */
 	off_t data_file_size;
-	if ( fseek(fpd, 0L, SEEK_END) ) { /* seek to end of file */
-		fprintf(stderr, "%s: Error getting file size of data: ", prog);
-		perror("");
-		exit(errno);
-	}
+	if (fpd != stdin) {
+		/* check size of data file */
+		if ( fseek(fpd, 0L, SEEK_END) ) { /* seek to end of file */
+			fprintf(stderr, "%s: Error getting file size of data: ", prog);
+			perror("");
+			exit(errno);
+		}
 
-	data_file_size = ftello(fpd); /* Sets file size equal to current offset */
-	if ( data_file_size == -1 ) {
-		fprintf(stderr, "%s: Error getting file size of data: ", prog);
-                perror("");
-                exit(errno);
-	}
-	
-	if ( fseek(fpd, 0L, SEEK_SET) ) { /* seek to beginning of file */
-                fprintf(stderr, "%s: Error getting file size of data: ", prog);
-                perror("");
-                exit(errno);
-        }
+		data_file_size = ftello(fpd); /* Sets file size equal to current offset */
+		if ( data_file_size == -1 ) {
+			fprintf(stderr, "%s: Error getting file size of data: ", prog);
+        	        perror("");
+        	        exit(errno);
+		}
+		
+		if ( fseek(fpd, 0L, SEEK_SET) ) { /* seek to beginning of file */
+        	        fprintf(stderr, "%s: Error getting file size of data: ", prog);
+        	        perror("");
+        	        exit(errno);
+        	}
 
-	if ( data_file_size == 0 ) {
-		fprintf(stderr, "%s: Size of data file is zero, no data to encode\n", prog);
-		exit(1);
+		if ( data_file_size == 0 ) {
+			fprintf(stderr, "%s: Size of data file is zero, no data to encode\n", prog);
+			exit(1);
+		}
+		if (verbose > 1) { fprintf(stderr, "%s: Data size: %i\n", prog, data_file_size); }
 	}
-	if (verbose > 1) { fprintf(stderr, "%s: Data size: %i\n", prog, data_file_size); }
-
 
 	size_t i = 0, n = 32;
 	char c;
@@ -275,11 +274,12 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 	size_t number_of_spaces = (n - 2);
 	if (verbose > 1) { fprintf(stderr, "%s: Number of usable spaces: %zu\n", prog, number_of_spaces); }
 	
-	/* calculates the number of bytes to put in each space */
 	unsigned long long int bytes_per_space;
-	bytes_per_space = ( data_file_size + (number_of_spaces - 1) ) / number_of_spaces;
-        if (verbose > 1) { fprintf(stderr, "%s: Bytes per space: %llu\n", prog, bytes_per_space); }
-
+	if (fpd != stdin) {
+		/* calculates the number of bytes to put in each space */
+		bytes_per_space = ( data_file_size + (number_of_spaces - 1) ) / number_of_spaces;
+        	if (verbose > 1) { fprintf(stderr, "%s: Bytes per space: %llu\n", prog, bytes_per_space); }
+	}
 
 	unsigned char data;
 	off_t j = 1;
@@ -313,42 +313,91 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 	int l;
 	int m;
 	while ( n < number_of_characters ) {
-		/* output data as utf8 characters */
-		for ( k = 1; k <= bytes_per_space && j <= data_file_size; ++k ) {
-			data = fgetc(fpd);
-			for ( m = 3; m >= 0; --m ) {
-				l = (data >> (m*2)) & 3;
-				if ( l == 0 ) {
-					if ( fputs(text0, fpt) == EOF ) {
-                                        	fprintf(stderr, "%s: Error writing to text: ", prog);
-                                        	perror("");
-                                        	exit(errno);
-                                	}
-				} else if ( l == 1 ) {
-					if ( fputs(text1, fpt) == EOF ) {
-                                        	fprintf(stderr, "%s: Error writing to text: ", prog);
-                                        	perror("");
-                                        	exit(errno);
-                                	}
-				} else if ( l == 2 ) {
-					if ( fputs(text2, fpt) == EOF ) {
-                                        	fprintf(stderr, "%s: Error writing to text: ", prog);
-                                        	perror("");
-                                        	exit(errno);
-                                	}
-				} else if ( l == 3 ) {
-					if ( fputs(text3, fpt) == EOF ) {
-                                        	fprintf(stderr, "%s: Error writing to text: ", prog);
-                                        	perror("");
-                                        	exit(errno);
-                                	}
-				} else {
-					fprintf(stderr, "%s: Error writing to text: ", prog);
-					exit(2);
-				}
+		if (fpd != stdin) {
+			/* output data as utf8 characters */
+			for ( k = 1; k <= bytes_per_space && j <= data_file_size; ++k ) {
+				data = fgetc(fpd);
+				for ( m = 3; m >= 0; --m ) {
+					l = (data >> (m*2)) & 3;
+					if ( l == 0 ) {
+						if ( fputs(text0, fpt) == EOF ) {
+                	                        	fprintf(stderr, "%s: Error writing to text: ", prog);
+                	                        	perror("");
+                	                        	exit(errno);
+                	                	}
+					} else if ( l == 1 ) {
+						if ( fputs(text1, fpt) == EOF ) {
+                	                        	fprintf(stderr, "%s: Error writing to text: ", prog);
+                	                        	perror("");
+                	                        	exit(errno);
+                	                	}
+					} else if ( l == 2 ) {
+						if ( fputs(text2, fpt) == EOF ) {
+                	                        	fprintf(stderr, "%s: Error writing to text: ", prog);
+                	                        	perror("");
+                	                        	exit(errno);
+                	                	}
+					} else if ( l == 3 ) {
+						if ( fputs(text3, fpt) == EOF ) {
+                	                        	fprintf(stderr, "%s: Error writing to text: ", prog);
+                	                        	perror("");
+                	                        	exit(errno);
+                	                	}
+					} else {
+						fprintf(stderr, "%s: Error writing to text: ", prog);
+						exit(2);
+					}
 
+				}
+				++j;
 			}
-			++j;
+		} else {
+			while (1) {
+				data = fgetc(fpd);
+
+				if ( ferror(fpd) ) {
+                		        fprintf(stderr, "%s: Error reading data stream: ", prog);
+                		        perror("");
+                		        exit(errno);
+                		}
+                		if ( feof(fpd) ) {
+                		        break;
+                		}
+
+
+                                for ( m = 3; m >= 0; --m ) {
+                                        l = (data >> (m*2)) & 3;
+                                        if ( l == 0 ) {
+                                                if ( fputs(text0, fpt) == EOF ) {
+                                                        fprintf(stderr, "%s: Error writing to text: ", prog);
+                                                        perror("");
+                                                        exit(errno);
+                                                }
+                                        } else if ( l == 1 ) {
+                                                if ( fputs(text1, fpt) == EOF ) {
+                                                        fprintf(stderr, "%s: Error writing to text: ", prog);
+                                                        perror("");
+                                                        exit(errno);
+                                                }
+                                        } else if ( l == 2 ) {
+                                                if ( fputs(text2, fpt) == EOF ) {
+                                                        fprintf(stderr, "%s: Error writing to text: ", prog);
+                                                        perror("");
+                                                        exit(errno);
+                                                }
+                                        } else if ( l == 3 ) {
+                                                if ( fputs(text3, fpt) == EOF ) {
+                                                        fprintf(stderr, "%s: Error writing to text: ", prog);
+                                                        perror("");
+                                                        exit(errno);
+                                                }
+                                        } else {
+                                                fprintf(stderr, "%s: Error writing to text: ", prog);
+                                                exit(2);
+                                        }
+
+                                }	
+			}
 		}
 
 		/* output one character from message */
