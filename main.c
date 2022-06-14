@@ -122,9 +122,13 @@ int main(int argc, char *argv[])
 		encode_data(fpm, fpd, fpt);
 
 	} else if (encode == 0) {
+		if ( isatty(fileno(fpt)) ) {
+			fprintf(stderr, "%s: Reading text from tty...\n", prog);
+		} else if (verbose) {
+			fprintf(stderr, "%s: Decoding data...\n", prog);
+		}
 
 		/* check magic numbers */
-		if (verbose) { fprintf(stderr, "%s: Decoding data...\n", prog); }
 		if (verbose > 1) { fprintf(stderr, "%s: Checking magic numbers...\n", prog); }
 		if ( !magic_number(fpt) ) {
 			decode_data(fpd, fpt);
