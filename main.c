@@ -182,24 +182,6 @@ int magic_number (FILE *fp)
 	}
 	return 1;
 
-	//unsigned char buffer[10];
-        //fgets(buffer, 10, fp);
-	//
-	//int i;
-	//for (i = 0; i < 5; i++) {
-	//	if ( buffer[i] == 0xe2 ) {
-	//		if ( buffer[i+1] == 0x80 ) {
-	//			if ( buffer[i+2] == 0x8b ) {
-	//				if ( buffer[i+3] == 0xcd ) {
-	//					if ( buffer[i+4] == 0x8f ) {
-	//						return 0;
-	//					}
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
-	//return 1;
 }
 
 void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
