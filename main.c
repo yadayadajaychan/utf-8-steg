@@ -8,7 +8,7 @@
  * Returns: exit code
  * 		0: magic number found
  * 		1: no magic numbers found */
-int magic_number (FILE *fp);
+int check_magic_number (FILE *fp);
 
 /* Encodes data into message and writes it to text
  * Arguments: file pointers to message, data, and text
@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
 
 		/* check magic numbers */
 		if (verbose > 1) { fprintf(stderr, "%s: Checking magic numbers...\n", prog); }
-		if ( !magic_number(fpt) ) {
+		if ( !check_magic_number(fpt) ) {
 			decode_data(fpd, fpt);
 		} else {
 			fprintf(stderr, "%s: text stream does not contain magic numbers\n", prog);
@@ -155,7 +155,7 @@ int main(int argc, char *argv[])
 	exit(0);
 }
 
-int magic_number (FILE *fp)
+int check_magic_number (FILE *fp)
 {
 	int i = 0, j = 0;
 	unsigned char data;
