@@ -215,7 +215,13 @@ int magic_number (FILE *fp)
 
 void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 {
-	off_t data_file_size;
+	off_t data_file_size = 0;
+	int data_from_tty = 0;
+	char *data_ptr;
+
+	size_t i = 0, n = 32;
+	char c;
+
 	if (fpd != stdin) {
 		/* check size of data file */
 		if ( fseek(fpd, 0L, SEEK_END) ) { /* seek to end of file */
@@ -242,11 +248,58 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 			exit(1);
 		}
 		if (verbose > 1) { fprintf(stderr, "%s: Data size: %i\n", prog, data_file_size); }
+	} else if ( data_from_tty = isatty(fileno(fpd)) ) {
+		/* buffer data into memory if data is being read from a tty */
+
+		/* allocate memory for data */
+        	if ( (data_ptr = (char*) calloc(n, sizeof(char))) == NULL ) {
+        	        fprintf(stderr, "%s: error allocating memory: ", prog);
+        	        perror("");
+        	        exit(errno);
+        	}
+
+		/* copy data into memory */
+		while (1) {
+			c = fgetc(fpd);
+			if ( ferror(fpd) ) {
+				fprintf(stderr, "%s: error allocating memory: ", prog);
+                                perror("");
+                                exit(errno);
+			}
+			if ( feof(fpd) ) {
+				break;
+			}
+                	if (i == n) { /* allocates more memory */
+                	        n = n + 32;
+                	        data_ptr = reallocarray(data_ptr, n, sizeof(char));
+                	        if (data_ptr == NULL) {
+                	                fprintf(stderr, "%s: error allocating memory: ", prog);
+                	                perror("");
+                	                exit(errno);
+                	        }
+                	}
+                	data_ptr[i] = c;
+                	++i;
+		}
+		
+		/* calculate data size */
+		i = 0;
+		while ( data_ptr[i] != 0 ) {
+			++i;
+		}
+		data_file_size = i;
+
+		if ( data_file_size == 0 ) {
+			fprintf(stderr, "%s: No data to encode", prog);
+			exit(1);
+		}
+		
 	}
 
-	size_t i = 0, n = 32;
-	char c;
-	/* allocate memory */
+	
+	i = 0;
+	n = 32;
+	/* allocate memory for message */
 	char *ptr;
 	if ( (ptr = (char*) calloc(n, sizeof(char))) == NULL ) {
 		fprintf(stderr, "%s: error allocating memory: ", prog);
@@ -286,14 +339,14 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 	if (verbose > 1) { fprintf(stderr, "%s: Number of usable spaces: %zu\n", prog, number_of_spaces); }
 	
 	unsigned long long int bytes_per_space;
-	if (fpd != stdin) {
+	if ( data_file_size != 0 ) {
 		/* calculates the number of bytes to put in each space */
 		bytes_per_space = ( data_file_size + (number_of_spaces - 1) ) / number_of_spaces;
         	if (verbose > 1) { fprintf(stderr, "%s: Bytes per space: %llu\n", prog, bytes_per_space); }
 	}
 
 	unsigned char data;
-	off_t j = 1;
+	off_t j = 0; /* counter for number of bytes written */
 	unsigned long long int k = 1;
 	int char_size, x = 0;
 	i = 0;
@@ -324,10 +377,17 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 	int l;
 	int m;
 	while ( n < number_of_characters ) {
-		if (fpd != stdin) {
+		if (data_file_size != 0) {
 			/* output data as utf8 characters */
-			for ( k = 1; k <= bytes_per_space && j <= data_file_size; ++k ) {
-				data = fgetc(fpd);
+			for ( k = 1; k <= bytes_per_space && j < data_file_size; ++k ) {
+				/* get data from either memory or stream */
+				if (data_from_tty) {
+					data = data_ptr[j];
+				} else {
+					data = fgetc(fpd);
+				}
+				
+				/* encode data */
 				for ( m = 3; m >= 0; --m ) {
 					l = (data >> (m*2)) & 3;
 					if ( l == 0 ) {
@@ -426,6 +486,9 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 	}
 
 	free(ptr);
+	if (data_from_tty) {
+		free(data_ptr);
+	}
 
 }
 
