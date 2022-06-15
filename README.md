@@ -144,6 +144,7 @@ This may be common sense, but the message can not contain any of the utf-8 chara
 - [x] Command line options
 - [x] Manual page
 - [x] Read data from stdin
+- [ ] Buffer text when reading from a tty in decode mode
 - [ ] Add checksum to verify data integrity
 - [ ] Better error handling
 
