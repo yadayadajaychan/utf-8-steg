@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
 	int encode = -1, opt;
 
 	/* command line option parsing */
-	while ( (opt = getopt(argc, argv, "cexd:m:t:v")) != -1 ) {
+	while ( (opt = getopt(argc, argv, "cexd:m:t:vh")) != -1 ) {
                 switch (opt) {
 		case 'c':
                 case 'e':
@@ -77,6 +77,9 @@ int main(int argc, char *argv[])
 		case 'v':
 			++verbose;
 			break;
+		case 'h':
+			fprintf(stderr, "See 'man utf-8-steg(1)'\n");
+			exit(0);
                 default:
                         exit(1);
                 }
