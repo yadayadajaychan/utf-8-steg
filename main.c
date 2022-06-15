@@ -233,6 +233,7 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 			exit(1);
 		}
 		if (verbose > 1) { fprintf(stderr, "%s: Data size: %i\n", prog, data_file_size); }
+
 	} else if ( data_from_tty = isatty(fileno(fpd)) ) {
 		/* buffer data into memory if data is being read from a tty */
 
@@ -278,6 +279,7 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 			fprintf(stderr, "%s: No data to encode", prog);
 			exit(1);
 		}
+		if (verbose > 1) { fprintf(stderr, "%s: Data size: %i\n", prog, data_file_size); }
 		
 	}
 
