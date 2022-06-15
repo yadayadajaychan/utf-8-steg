@@ -118,13 +118,20 @@ int main(int argc, char *argv[])
 
 
 	if (encode == 1) {
+		if ( isatty(fileno(fpm)) && verbose ) {
+			fprintf(stderr, "%s: Reading message from tty...\n", prog);
+		} else if ( isatty(fileno(fpd)) && verbose ) {
+			fprintf(stderr, "%s: Reading data from tty...\n", prog);
+		}
+
 		if (verbose) { fprintf(stderr, "%s: Encoding data...\n", prog); }
 		encode_data(fpm, fpd, fpt);
 
 	} else if (encode == 0) {
 		if ( isatty(fileno(fpt)) && verbose ) {
-			fprintf(stderr, "%s: Decoding data from tty...\n", prog);
-		} else if (verbose) {
+			fprintf(stderr, "%s: Reading text from tty...\n", prog);
+		}
+		if (verbose) {
 			fprintf(stderr, "%s: Decoding data...\n", prog);
 		}
 
