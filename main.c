@@ -366,6 +366,7 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 	const char text1[4] = {0xe2, 0x80, 0x8c, 0};
 	const char text2[4] = {0xe2, 0x80, 0x8d, 0};
 	const char text3[4] = {0xe2, 0x81, 0xa0, 0};
+	const char text4[3] = {0xcd, 0x8f, 0};
 	int l;
 	int m;
 	while ( n < number_of_characters ) {
@@ -474,6 +475,61 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 			}
 		}
 
+		/* calculates and encodes md5sum during last iteration of loop */
+		if ( (n+1) == number_of_characters ) {
+			MD5_Final(digest, &context);
+
+			/* output delimiter to signal end of data and start of checksum */
+			 if ( fputs(text4, fpt) == EOF ) {
+                         	fprintf(stderr, "%s: Error writing to text: ", prog);
+                         	perror("");
+                         	exit(errno);
+			 }
+
+			for (x = 0; x < MD5_DIGEST_LENGTH; ++x) {
+				for ( m = 3; m >= 0; --m ) {
+                        	        l = (digest[x] >> (m*2)) & 3;
+                        	        if ( l == 0 ) {
+                        	                if ( fputs(text0, fpt) == EOF ) {
+                        	                        fprintf(stderr, "%s: Error writing to text: ", prog);
+                        	                        perror("");
+                        	                        exit(errno);
+                        	                }
+                        	        } else if ( l == 1 ) {
+                        	                if ( fputs(text1, fpt) == EOF ) {
+                        	                        fprintf(stderr, "%s: Error writing to text: ", prog);
+                        	                        perror("");
+                        	                        exit(errno);
+                        	                }
+                        	        } else if ( l == 2 ) {
+                        	                if ( fputs(text2, fpt) == EOF ) {
+                        	                        fprintf(stderr, "%s: Error writing to text: ", prog);
+                        	                        perror("");
+                        	                        exit(errno);
+                        	                }
+                        	        } else if ( l == 3 ) {
+                        	                if ( fputs(text3, fpt) == EOF ) {
+                        	                        fprintf(stderr, "%s: Error writing to text: ", prog);
+                        	                        perror("");
+                        	                        exit(errno);
+                        	                }
+                        	        } else {
+                        	                fprintf(stderr, "%s: Error writing to text: ", prog);
+                        	                exit(2);
+                        	        }
+                        	                                                                              
+                        	}
+			}
+
+			/* output delimiter to signal end of checksum */
+			 if ( fputs(text4, fpt) == EOF ) {
+                         	fprintf(stderr, "%s: Error writing to text: ", prog);
+                         	perror("");
+                         	exit(errno);
+			 }
+
+		}
+
 		/* output one character from message */
 		char_size = checkbytes(ptr[i]);
 		for ( x = 1; x <= char_size; ++x ) {
@@ -493,10 +549,10 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 		free(data_ptr);
 	}
 
-	MD5_Final(digest, &context);
-	if (verbose) {
-		for(n=0; n<MD5_DIGEST_LENGTH; n++)
-			fprintf(stderr, "%02x", digest[n]);
+	if (verbose >= 2) {
+		fprintf(stderr, "%s: MD5 = ", prog);
+		for(x = 0; x < MD5_DIGEST_LENGTH; ++x)
+			fprintf(stderr, "%02x", digest[x]);
 		fprintf(stderr, "\n");
 	}
 
