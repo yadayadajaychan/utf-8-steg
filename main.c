@@ -677,18 +677,28 @@ void decode_data(FILE *fpd, FILE *fpt)
 		}
 	}
 
-	
-
-	/* verify checksum */
-	MD5_Final(calculated_digest, &context);
+	/* check if no checksum was given */
 	for (l = 0; l < MD5_DIGEST_LENGTH; ++l) {
-		if (calculated_digest[l] != given_digest[l]) {
-			fprintf(stderr, "%s: Checksum mismatch!\n", prog);
-			exit(1);
+		if (given_digest[l] != 0) {
+			break;
+		}
+		if ( (l+1) == MD5_DIGEST_LENGTH ) {
+			fprintf(stderr, "%s: Warning: No checksum detected\n", prog);
 		}
 	}
-	if (verbose) {
-		fprintf(stderr, "%s: Checksum verified\n", prog);
+
+	if (l != MD5_DIGEST_LENGTH) {
+		/* verify checksum */
+		MD5_Final(calculated_digest, &context);
+		for (l = 0; l < MD5_DIGEST_LENGTH; ++l) {
+			if (calculated_digest[l] != given_digest[l]) {
+				fprintf(stderr, "%s: Checksum mismatch!\n", prog);
+				exit(1);
+			}
+		}
+		if (verbose) {
+			fprintf(stderr, "%s: Checksum verified\n", prog);
+		}
 	}
 
 	/* check if final delimiter was read */
