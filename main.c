@@ -362,6 +362,7 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 	uint8_t digest[MD5_DIGEST_LENGTH];
 	MD5_Init(&context);
 
+	/* boolean for whether or not the checksum has been outputted */
 	int checksum_outputted = 0;
 
 	const char text0[4] = {0xe2, 0x80, 0x8b, 0};
@@ -572,6 +573,14 @@ void decode_data(FILE *fpd, FILE *fpt)
 	unsigned char buffer[4] = {0};
 	int i = 0, j = 0, k = 3;
 
+	int is_checksum = 0;
+	MD5_CTX context;
+	MD5_Init(&context);
+
+	int l = 0; /* iterator for given digest */
+	uint8_t calculated_digest[MD5_DIGEST_LENGTH] = {0};
+	uint8_t given_digest[MD5_DIGEST_LENGTH] = {0};
+
 	/* decode data */
 	while (1) {
 		text = fgetc(fpt);
@@ -599,7 +608,13 @@ void decode_data(FILE *fpd, FILE *fpt)
 					if ( buffer[2] == 0x8b ) {
 						--k;
 						if ( k < 0 ) {
-							fputc(data, fpd);
+							if ( is_checksum && (l < MD5_DIGEST_LENGTH) ) {
+								given_digest[l] = data;
+								++l;
+							} else {
+								MD5_Update(&context, &data, 1);
+								fputc(data, fpd);
+							}
 							data = 0;
 							k = 3;
 						}
@@ -608,7 +623,13 @@ void decode_data(FILE *fpd, FILE *fpt)
 						data = data | (1 << (k*2));
 						--k;
 						if ( k < 0 ) {
-							fputc(data, fpd);
+							if ( is_checksum && (l < MD5_DIGEST_LENGTH) ) {
+								given_digest[l] = data;
+								++l;
+							} else {
+								MD5_Update(&context, &data, 1);
+								fputc(data, fpd);
+							}
 							data = 0;
 							k = 3;
 						}
@@ -617,7 +638,13 @@ void decode_data(FILE *fpd, FILE *fpt)
 						data = data | (2 << (k*2));
 						--k;
 						if ( k < 0 ) {
-							fputc(data, fpd);
+							if ( is_checksum && (l < MD5_DIGEST_LENGTH) ) {
+								given_digest[l] = data;
+								++l;
+							} else {
+								MD5_Update(&context, &data, 1);
+								fputc(data, fpd);
+							}
 							data = 0;
 							k = 3;
 						}	
@@ -627,7 +654,13 @@ void decode_data(FILE *fpd, FILE *fpt)
 						data = data | (3 << (k*2));
 						--k;
 						if ( k < 0 ) {
-							fputc(data, fpd);
+							if ( is_checksum && (l < MD5_DIGEST_LENGTH) ) {
+								given_digest[l] = data;
+								++l;
+							} else {
+								MD5_Update(&context, &data, 1);
+								fputc(data, fpd);
+							}
 							data = 0;
 							k = 3;
 						}
@@ -635,10 +668,34 @@ void decode_data(FILE *fpd, FILE *fpt)
 				}
 
 			} else if ( j == 2 && buffer[0] == 0xcd && buffer[1] == 0x8f ) {
-				;
+				if (is_checksum) {
+					is_checksum = 2;
+				} else {
+					is_checksum = 1;
+				}
 			}
 		}
 	}
+
+	
+
+	/* verify checksum */
+	MD5_Final(calculated_digest, &context);
+	for (l = 0; l < MD5_DIGEST_LENGTH; ++l) {
+		if (calculated_digest[l] != given_digest[l]) {
+			fprintf(stderr, "%s: Checksum mismatch!\n", prog);
+			exit(1);
+		}
+	}
+	if (verbose) {
+		fprintf(stderr, "%s: Checksum verified\n", prog);
+	}
+
+	/* check if final delimiter was read */
+	if (is_checksum != 2) {
+		fprintf(stderr, "%s: Warning: final delimiter not read, meaning text might have been cut off\n", prog);
+	}
+
 }
 
 int checkbit (char data, int bit)
