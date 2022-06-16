@@ -117,7 +117,7 @@ This program is available in the AUR as [utf-8-steg-git](https://aur.archlinux.o
 To install using an AUR helper, run `yay -S utf-8-steg-git`
 
 ## Compiling
-```gcc main.c```
+```gcc main.c -l crypto```
 
 Tested on Arch Linux.
 

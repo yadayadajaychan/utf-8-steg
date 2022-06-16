@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <unistd.h>
+#include <openssl/md5.h>
 
 /* Parses through the first 9 bytes of stream for magic number (does not reset stream)
  * Arguments: file pointer
@@ -356,7 +357,11 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 		exit(errno);
 	}
 
-	char text[4] = {0};
+	/* initialize MD5_CTX structure */
+	MD5_CTX context;
+	uint8_t digest[MD5_DIGEST_LENGTH];
+	MD5_Init(&context);
+
 	const char text0[4] = {0xe2, 0x80, 0x8b, 0};
 	const char text1[4] = {0xe2, 0x80, 0x8c, 0};
 	const char text2[4] = {0xe2, 0x80, 0x8d, 0};
@@ -372,6 +377,12 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 					data = data_ptr[j];
 				} else {
 					data = fgetc(fpd);
+				}
+
+				/* update md5 */
+				if ( !MD5_Update(&context, &data, 1) ) {
+					fprintf(stderr, "%s: Error calculating checksum\n", prog);
+					exit(2);
 				}
 				
 				/* encode data */
@@ -422,6 +433,11 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
                 		        break;
                 		}
 
+				/* update md5 */
+				if ( !MD5_Update(&context, &data, 1) ) {
+					fprintf(stderr, "%s: Error calculating checksum\n", prog);
+					exit(2);
+				}
 
                                 for ( m = 3; m >= 0; --m ) {
                                         l = (data >> (m*2)) & 3;
@@ -475,6 +491,13 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 	free(ptr);
 	if (data_from_tty) {
 		free(data_ptr);
+	}
+
+	MD5_Final(digest, &context);
+	if (verbose) {
+		for(n=0; n<MD5_DIGEST_LENGTH; n++)
+			fprintf(stderr, "%02x", digest[n]);
+		fprintf(stderr, "\n");
 	}
 
 }
