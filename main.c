@@ -362,6 +362,8 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 	uint8_t digest[MD5_DIGEST_LENGTH];
 	MD5_Init(&context);
 
+	int checksum_outputted = 0;
+
 	const char text0[4] = {0xe2, 0x80, 0x8b, 0};
 	const char text1[4] = {0xe2, 0x80, 0x8c, 0};
 	const char text2[4] = {0xe2, 0x80, 0x8d, 0};
@@ -475,8 +477,13 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 			}
 		}
 
-		/* calculates and encodes md5sum during last iteration of loop */
-		if ( (n+1) == number_of_characters ) {
+		/* calculates and encodes md5sum after all data is encoded */
+		if ( checksum_outputted == 0 && 
+				((data_file_size != 0 && j == data_file_size) ||
+				 (data_file_size == 0 && feof(fpd))) ) {
+
+			checksum_outputted = 1;
+
 			MD5_Final(digest, &context);
 
 			/* output delimiter to signal end of data and start of checksum */
