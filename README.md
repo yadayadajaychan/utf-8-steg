@@ -146,12 +146,13 @@ This program currently can't parse the argument '-' as stdin/stdout.
 
 Each zero-width character takes up 3 bytes but only encodes two bits of data, meaning 12 bytes is going to be needed to encode 1 byte of data. When trying to encode very large files, pasting the text into an application can cause it to hang.
 
-This may be common sense, but the message can not contain any of the utf-8 characters used to encode the data. 
+The message can not contain any of the utf-8 characters used to encode the data. 
 ## TODO
 - [x] Command line options
 - [x] Manual page
 - [x] Read data from stdin
 - [ ] Buffer text when reading from a tty in decode mode
-- [ ] Add checksum to verify data integrity
+- [x] Add checksum to verify data integrity
+- [ ] Add command line switch to disable checksum
 - [ ] Better error handling
 
