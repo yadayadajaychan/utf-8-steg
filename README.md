@@ -111,10 +111,17 @@ SEE ALSO
 
 utf-8-steg 0.1.2                  2022-06-12                     UTF-8-STEG(1)
 ```
+
 ## Installing
 This program is available in the AUR as [utf-8-steg-git](https://aur.archlinux.org/pkgbase/utf-8-steg-git).
 
 To install using an AUR helper, run `yay -S utf-8-steg-git`
+
+## Dependencies
+```
+glibc
+openssl
+```
 
 ## Compiling
 ```gcc main.c -l crypto```
