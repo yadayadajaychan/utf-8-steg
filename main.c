@@ -693,12 +693,31 @@ void decode_data(FILE *fpd, FILE *fpt)
 		for (l = 0; l < MD5_DIGEST_LENGTH; ++l) {
 			if (calculated_digest[l] != given_digest[l]) {
 				fprintf(stderr, "%s: Checksum mismatch!\n", prog);
+
+				fprintf(stderr, "%s: Calculated MD5 = ", prog);
+				for (l = 0; l < MD5_DIGEST_LENGTH; ++l)
+					fprintf(stderr, "%02x", calculated_digest[l]);
+				fprintf(stderr, "\n");
+
+				fprintf(stderr, "%s: Given MD5      = ", prog);
+				for (l = 0; l < MD5_DIGEST_LENGTH; ++l)
+					fprintf(stderr, "%02x", given_digest[l]);
+				fprintf(stderr, "\n");
+
 				exit(1);
 			}
 		}
 		if (verbose) {
 			fprintf(stderr, "%s: Checksum verified\n", prog);
 		}
+
+		if (verbose >= 2) {
+			fprintf(stderr, "%s: MD5 = ", prog);
+			for (l = 0; l < MD5_DIGEST_LENGTH; ++l)
+				fprintf(stderr, "%02x", calculated_digest[l]);
+			fprintf(stderr, "\n");
+		}
+
 	}
 
 	/* check if final delimiter was read */
