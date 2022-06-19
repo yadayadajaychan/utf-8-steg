@@ -1,5 +1,5 @@
 .\" Manpage for utf-8-steg
-.TH UTF-8-STEG 1 2022-06-12 "utf-8-steg 0.1.2" "User Commands"
+.TH UTF-8-STEG 1 2022-06-19 "utf-8-steg 0.2.1" "User Commands"
 .SH NAME
 utf-8-steg \- encodes/decodes data into zero-width utf-8 characters
 .SH SYNOPSIS
@@ -48,7 +48,9 @@ Minor errors
 Major errors
 .SH NOTES
 .PP
-This program currently can\'t parse the argument \'\-\' as stdin/stdout. If data is read from stdin in encode mode, \fButf-8-steg\fR will not spread out the encoded data in the message because it can't get the size of the input stream.
+When pasting into the terminal, the maximum line length is 4096 chars and anything after that is discarded. This ensures that the terminal can always receive more input until at least one line can be read, but as a consequence, \fButf-8-steg\fR will be unable to read the discarded characters. If this is the case, use a file or a pipe instead of the terminal.
+.PP
+This program currently can\'t parse the argument \'\-\' as stdin/stdout. In addition, if data is read from stdin in encode mode, \fButf-8-steg\fR will not spread out the encoded data in the message because it can't get the size of the input stream.
 .PP
 Each zero-width character takes up 3 bytes but only encodes two bits of data, meaning 12 bytes is going to be needed to encode 1 byte of data.
 .PP

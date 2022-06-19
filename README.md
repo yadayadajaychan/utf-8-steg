@@ -62,15 +62,22 @@ EXIT STATUS
        2      Major errors
 
 NOTES
-       This program currently can't parse the argument '-' as stdin/stdout. If
-       data is read from stdin in encode mode, utf-8-steg will not spread  out
-       the  encoded  data  in the message because it can't get the size of the
-       input stream.
+       When  pasting  into the terminal, the maximum line length is 4096 chars
+       and anything after that is discarded. This ensures  that  the  terminal
+       can  always receive more input until at least one line can be read, but
+       as a consequence, utf-8-steg will be unable to read the discarded char-
+       acters. If this is the case, use a file or a pipe instead of the termi-
+       nal.
+
+       This program currently can't parse the argument '-' as stdin/stdout. In
+       addition,  if  data  is read from stdin in encode mode, utf-8-steg will
+       not spread out the encoded data in the message because it can't get the
+       size of the input stream.
 
        Each zero-width character takes up 3 bytes but only encodes two bits of
        data, meaning 12 bytes is going to be needed to encode 1 byte of data.
 
-       message  can not contain any of the utf-8 characters used to encode the
+       message can not contain any of the utf-8 characters used to encode  the
        data, namely U+200B, U+200C, U+200D, U+2060, and U+034F.
 
 BUGS
@@ -84,17 +91,17 @@ EXAMPLES
 
        $ utf-8-steg -em message
 
-       Encodes  data  from stdin, reads message from file named "message", and
+       Encodes data from stdin, reads message from file named  "message",  and
        outputs text to stdout
 
        $ utf-8-steg -ed data -m message
 
-       Encodes data from file named "data",  reads  message  from  file  named
+       Encodes  data  from  file  named  "data", reads message from file named
        "message", and outputs text to stdout
 
        $ utf-8-steg -xt text
 
-       Reads  text from file named "text" and outputs the decoded data to std-
+       Reads text from file named "text" and outputs the decoded data to  std-
        out
 
        $ utf-8-steg -x
@@ -109,7 +116,7 @@ SEE ALSO
 
 
 
-utf-8-steg 0.1.2                  2022-06-12                     UTF-8-STEG(1)
+utf-8-steg 0.2.1                  2022-06-19                     UTF-8-STEG(1)
 ```
 
 ## Installing
@@ -151,7 +158,7 @@ The message can not contain any of the utf-8 characters used to encode the data.
 - [x] Command line options
 - [x] Manual page
 - [x] Read data from stdin
-- [ ] Buffer text when reading from a tty in decode mode
+- [x] Buffer text when reading from a tty in decode mode
 - [x] Add checksum to verify data integrity
 - [ ] Add command line switch to disable checksum
 - [ ] Better error handling
