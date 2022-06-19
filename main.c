@@ -581,16 +581,75 @@ void decode_data(FILE *fpd, FILE *fpt)
 	uint8_t calculated_digest[MD5_DIGEST_LENGTH] = {0};
 	uint8_t given_digest[MD5_DIGEST_LENGTH] = {0};
 
-	/* decode data */
-	while (1) {
-		text = fgetc(fpt);
-		if ( ferror(fpt) ) {
-			fprintf(stderr, "%s: Error reading text stream: ", prog);
-			perror("");
-			exit(errno);
+	/* buffer text if reading from a tty */
+	int text_is_from_tty;
+	unsigned char *text_ptr;
+	int n = 32;
+	off_t text_file_size = 0;
+	if ( text_is_from_tty = isatty(fileno(fpt)) ) {
+
+		unsigned char c;
+		/* allocate memory for text */
+        	if ( (text_ptr = (unsigned char*) calloc(n, sizeof(unsigned char))) == NULL ) {
+        	        fprintf(stderr, "%s: error allocating memory: ", prog);
+        	        perror("");
+        	        exit(errno);
+        	}
+
+		/* copy text into memory */
+		i = 0;
+		while (1) {
+			c = fgetc(fpt);
+			if ( ferror(fpt) ) {
+				fprintf(stderr, "%s: error allocating memory: ", prog);
+                                perror("");
+                                exit(errno);
+			}
+			if ( feof(fpt) ) {
+				break;
+			}
+                	if (i == n) { /* allocates more memory */
+                	        n = n + 32;
+                	        text_ptr = reallocarray(text_ptr, n, sizeof(unsigned char));
+                	        if (text_ptr == NULL) {
+                	                fprintf(stderr, "%s: error allocating memory: ", prog);
+                	                perror("");
+                	                exit(errno);
+                	        }
+                	}
+                	text_ptr[i] = c;
+                	++i;
 		}
-		if ( feof(fpt) ) {
-			break;
+
+		text_file_size = i;
+
+		if ( text_file_size == 0 ) {
+			fprintf(stderr, "%s: No text to decode", prog);
+			exit(1);
+		}
+		if (verbose > 1)
+			fprintf(stderr, "%s: Text size: %i\n", prog, text_file_size);
+
+	}
+
+	/* decode data */
+	i = 0;
+	n = 0;
+	while (1) {
+		if (text_is_from_tty) {
+			if (n == text_file_size) 
+				break;
+			text = text_ptr[n];
+			n++;
+		} else {
+			text = fgetc(fpt);
+			if ( ferror(fpt) ) {
+				fprintf(stderr, "%s: Error reading text stream: ", prog);
+				perror("");
+				exit(errno);
+			}
+			if ( feof(fpt) )
+				break;
 		}
 
 		if ( i == j ) {
@@ -723,6 +782,10 @@ void decode_data(FILE *fpd, FILE *fpt)
 	/* check if final delimiter was read */
 	if (is_checksum != 2) {
 		fprintf(stderr, "%s: Warning: final delimiter not read, meaning text might have been cut off\n", prog);
+	}
+
+	if (text_is_from_tty) {
+		free(text_ptr);
 	}
 
 }
