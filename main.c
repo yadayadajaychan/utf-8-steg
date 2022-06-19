@@ -269,11 +269,6 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
                 	++i;
 		}
 		
-		/* calculate data size */
-		i = 0;
-		while ( data_ptr[i] != 0 ) {
-			++i;
-		}
 		data_file_size = i;
 
 		if ( data_file_size == 0 ) {
