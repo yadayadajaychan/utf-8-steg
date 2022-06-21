@@ -9,7 +9,7 @@
  * Returns: exit code
  * 		0: magic number found
  * 		1: no magic numbers found */
-int check_magic_number (FILE *fp);
+int check_magic_number(FILE *fp);
 
 /* Encodes data into message and writes it to text
  * Arguments: file pointers to message, data, and text
@@ -26,12 +26,12 @@ void decode_data(FILE *fpd, FILE *fpt);
  * Returns: exit code
  * 		0: bit not set
  * 		1: bit is set */
-int checkbit (char data, int bit);
+int checkbit(char data, int bit);
 
 /* Takes first byte of utf8 character and returns how many bits are set
  * Arguments: char
  * Returns: number of bits set */
-int checkbytes (char data);
+int checkbytes(char data);
 
 char *prog;
 int verbose = 0;
@@ -156,7 +156,7 @@ int main(int argc, char *argv[])
 	exit(0);
 }
 
-int check_magic_number (FILE *fp)
+int check_magic_number(FILE *fp)
 {
 	int i = 0, j = 0;
 	unsigned char data;
@@ -785,7 +785,7 @@ void decode_data(FILE *fpd, FILE *fpt)
 
 }
 
-int checkbit (char data, int bit)
+int checkbit(char data, int bit)
 {
 	if ( data & (1<<bit) ) {
 		return 1;
@@ -794,7 +794,7 @@ int checkbit (char data, int bit)
 	}
 }
 
-int checkbytes (char data)
+int checkbytes(char data)
 {
 	int bytes = 1, i = 7;
 	
