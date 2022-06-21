@@ -35,7 +35,6 @@ int checkbytes(char data);
 
 char *prog;
 int verbose = 0;
-static const char magic[] = {0xe2, 0x80, 0x8b, 0xcd, 0x8f, 0};
 int main(int argc, char *argv[])
 {
 	FILE *fpd = NULL; /* file pointer to data */
@@ -336,6 +335,7 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 	n = 0; /* counter for number of characters written */
 
 	/* output one character from message and magic number */
+	static const char magic[] = {0xe2, 0x80, 0x8b, 0xcd, 0x8f, 0};
 	char_size = checkbytes(ptr[i]);
         for ( x = 1; x <= char_size; ++x ) {
                 if ( fputc(ptr[i], fpt) == EOF ) {
