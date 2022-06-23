@@ -162,5 +162,5 @@ The message can not contain any of the utf-8 characters used to encode the data.
 - [x] Add checksum to verify data integrity
 - [ ] Add command line switch to disable checksum
 - [ ] Simplify code
+- [ ] Detect multiple magic numbers
 - [ ] Better error handling
-
