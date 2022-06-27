@@ -165,3 +165,4 @@ The message can not contain any of the utf-8 characters used to encode the data.
 - [ ] Detect multiple magic numbers
 - [ ] Warn if extra operands are given
 - [ ] Better error handling
+- [ ] Improve performance
