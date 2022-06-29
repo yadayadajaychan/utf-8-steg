@@ -4,33 +4,43 @@
 #include <unistd.h>
 #include <openssl/md5.h>
 
-/* Parses through the first 9 bytes of stream for magic number (does not reset stream)
+/* 
+ * Parses through the first 9 bytes of stream for magic number (does not reset stream)
  * Arguments: file pointer
  * Returns: exit code
  * 		0: magic number found
- * 		1: no magic numbers found */
+ * 		1: no magic numbers found
+ */
 int check_magic_number(FILE *fp);
 
-/* Encodes data into message and writes it to text
+/* 
+ * Encodes data into message and writes it to text
  * Arguments: file pointers to message, data, and text
- * Returns: void */
+ * Returns: void
+ */
 void encode_data(FILE *fpm, FILE *fpd, FILE *fpt);
 
-/* Decodes data from text and writes it to data file stream
+/* 
+ * Decodes data from text and writes it to data file stream
  * Arguments: file pointers to text and data
- * Returns: void */
+ * Returns: void
+ */
 void decode_data(FILE *fpd, FILE *fpt);
 
-/* Takes char and checks if nth bit is set
+/* 
+ * Takes char and checks if nth bit is set
  * Arguments: char, n
  * Returns: exit code
  * 		0: bit not set
- * 		1: bit is set */
+ * 		1: bit is set
+ */
 int checkbit(char data, int bit);
 
-/* Takes first byte of utf8 character and returns how many bits are set
+/* 
+ * Takes first byte of utf8 character and returns how many bits are set
  * Arguments: char
- * Returns: number of bits set */
+ * Returns: number of bits set
+ */
 int checkbytes(char data);
 
 char *prog;
