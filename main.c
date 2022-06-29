@@ -8,10 +8,10 @@
  * Parses through the first 9 bytes of stream for magic number (does not reset stream)
  * Arguments: file pointer
  * Returns: exit code
- * 		0: magic number found
- * 		1: no magic numbers found
+ * 		1: magic number found
+ * 		0: no magic numbers found
  */
-int check_magic_number(FILE *fp);
+int magic_number_present(FILE *fp);
 
 /* 
  * Encodes data into message and writes it to text
@@ -149,8 +149,9 @@ int main(int argc, char *argv[])
 		}
 
 		/* check magic numbers */
-		if (verbose > 1) { fprintf(stderr, "%s: Checking magic numbers...\n", prog); }
-		if ( !check_magic_number(fpt) ) {
+		if (verbose > 1)
+			fprintf(stderr, "%s: Checking magic numbers...\n", prog);
+		if ( magic_number_present(fpt) ) {
 			decode_data(fpd, fpt);
 		} else {
 			fprintf(stderr, "%s: text stream does not contain magic numbers\n", prog);
@@ -165,7 +166,7 @@ int main(int argc, char *argv[])
 	exit(0);
 }
 
-int check_magic_number(FILE *fp)
+int magic_number_present(FILE *fp)
 {
 	int i = 0, j = 0;
 	unsigned char data;
@@ -189,7 +190,7 @@ int check_magic_number(FILE *fp)
 		} else if ( data == 0xcd && j == 3 ) {
 			++j;
 		} else if ( data == 0x8f && j == 4 ) {
-			return 0;
+			return 1;
 		} else if ( j > 0 ) {
 			j = 0;
 			if ( data == 0xe2 ) {
@@ -204,7 +205,7 @@ int check_magic_number(FILE *fp)
 		++i;
 
 	}
-	return 1;
+	return 0;
 
 }
 
