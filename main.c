@@ -242,7 +242,8 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 			fprintf(stderr, "%s: Size of data file is zero, no data to encode\n", prog);
 			exit(1);
 		}
-		if (verbose > 1) { fprintf(stderr, "%s: Data size: %i\n", prog, data_file_size); }
+		if (verbose > 1)
+			fprintf(stderr, "%s: Data size: %i\n", prog, data_file_size);
 
 	} else if ( data_from_tty = isatty(fileno(fpd)) ) {
 		/* buffer data into memory if data is being read from a tty */
@@ -284,7 +285,8 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 			fprintf(stderr, "%s: No data to encode", prog);
 			exit(1);
 		}
-		if (verbose > 1) { fprintf(stderr, "%s: Data size: %i\n", prog, data_file_size); }
+		if (verbose > 1)
+			fprintf(stderr, "%s: Data size: %i\n", prog, data_file_size);
 		
 	}
 
@@ -326,15 +328,18 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 		exit(1);
 	}
 	size_t number_of_characters = n;
-	if (verbose > 1) { fprintf(stderr, "%s: Number of characters: %zu\n", prog, number_of_characters); }
+	if (verbose > 1)
+		fprintf(stderr, "%s: Number of characters: %zu\n", prog, number_of_characters);
 	size_t number_of_spaces = (n - 2);
-	if (verbose > 1) { fprintf(stderr, "%s: Number of usable spaces: %zu\n", prog, number_of_spaces); }
+	if (verbose > 1)
+		fprintf(stderr, "%s: Number of usable spaces: %zu\n", prog, number_of_spaces);
 	
 	unsigned long long int bytes_per_space;
 	if ( data_file_size != 0 ) {
 		/* calculates the number of bytes to put in each space */
 		bytes_per_space = ( data_file_size + (number_of_spaces - 1) ) / number_of_spaces;
-        	if (verbose > 1) { fprintf(stderr, "%s: Bytes per space: %llu\n", prog, bytes_per_space); }
+		if (verbose > 1)
+			fprintf(stderr, "%s: Bytes per space: %llu\n", prog, bytes_per_space);
 	}
 
 	unsigned char data;
@@ -771,9 +776,8 @@ void decode_data(FILE *fpd, FILE *fpt)
 				exit(1);
 			}
 		}
-		if (verbose) {
+		if (verbose)
 			fprintf(stderr, "%s: Checksum verified\n", prog);
-		}
 
 		if (verbose >= 2) {
 			fprintf(stderr, "%s: MD5 = ", prog);
