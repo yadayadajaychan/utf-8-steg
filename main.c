@@ -58,45 +58,45 @@ int main(int argc, char *argv[])
 
 	/* command line option parsing */
 	while ( (opt = getopt(argc, argv, "cexd:m:t:vh")) != -1 ) {
-                switch (opt) {
+		switch (opt) {
 		case 'c':
-                case 'e':
-                        encode = 1;
-                        break;
-                case 'x':
-                        encode = 0;
-                        break;
-                case 'd':
+		case 'e':
+			encode = 1;
+			break;
+		case 'x':
+			encode = 0;
+			break;
+		case 'd':
 			if ( (fpd = fopen(optarg, "r")) == NULL ) {
-                        	fprintf(stderr, "%s: cannot access '%s': ", prog, optarg);
-                        	perror("");
-                        	exit(errno);
-                	}
-                        break;
-                case 'm':
+				fprintf(stderr, "%s: cannot access '%s': ", prog, optarg);
+				perror("");
+				exit(errno);
+			}
+			break;
+		case 'm':
 			if ( (fpm = fopen(optarg, "r")) == NULL ) {
-                                fprintf(stderr, "%s: cannot access '%s': ", prog, optarg);
-                                perror("");
-                                exit(errno);
-                        }
-                        break;
-                case 't':
+				fprintf(stderr, "%s: cannot access '%s': ", prog, optarg);
+				perror("");
+				exit(errno);
+			}
+			break;
+		case 't':
 			if ( (fpt = fopen(optarg, "r")) == NULL ) {
-                                fprintf(stderr, "%s: cannot access '%s': ", prog, optarg);
-                                perror("");
-                                exit(errno);
-                        }
-                        break;
+				fprintf(stderr, "%s: cannot access '%s': ", prog, optarg);
+				perror("");
+				exit(errno);
+			}
+			break;
 		case 'v':
 			++verbose;
 			break;
 		case 'h':
 			fprintf(stderr, "See 'man utf-8-steg(1)'\n");
 			exit(0);
-                default:
-                        exit(1);
-                }
-        }
+		default:
+			exit(1);
+		}
+	}
 
 	if ( encode == -1 ) {
 		fprintf(stderr, "%s: No action specified\n", prog);
@@ -121,15 +121,15 @@ int main(int argc, char *argv[])
 	}
 	if ( encode == 0 ) {
 		if (fpt == NULL) {
-                        fpt = stdin;
-                }
-                if (fpd == NULL) {
-                        fpd = stdout;
-                }
-                if (fpm != NULL) {
+			fpt = stdin;
+		}
+		if (fpd == NULL) {
+			fpd = stdout;
+		}
+		if (fpm != NULL) {
 			fprintf(stderr, "%s: Ignoring message file because currently in decode mode\n", prog);
-                        fpm = NULL;
-                }
+			fpm = NULL;
+		}
 	}
 
 
@@ -197,8 +197,8 @@ int is_magic_number_present(FILE *fp)
 		} else if ( j > 0 ) {
 			j = 0;
 			if ( data == 0xe2 ) {
-                        	++j;
-                	}
+				++j;
+			}
 		}
 
 		if ( i == 4 && j == 0 ) {
@@ -226,28 +226,28 @@ void output_byte_to_utf8_stream(unsigned char data, FILE *fpt)
 		l = (data >> (m*2)) & 3;
 		if ( l == 0 ) {
 			if ( fputs(text0, fpt) == EOF ) {
-                        	fprintf(stderr, "%s: Error writing to text: ", prog);
-                        	perror("");
-                        	exit(errno);
-                	}
+				fprintf(stderr, "%s: Error writing to text: ", prog);
+				perror("");
+				exit(errno);
+			}
 		} else if ( l == 1 ) {
 			if ( fputs(text1, fpt) == EOF ) {
-                        	fprintf(stderr, "%s: Error writing to text: ", prog);
-                        	perror("");
-                        	exit(errno);
-                	}
+				fprintf(stderr, "%s: Error writing to text: ", prog);
+				perror("");
+				exit(errno);
+			}
 		} else if ( l == 2 ) {
 			if ( fputs(text2, fpt) == EOF ) {
-                        	fprintf(stderr, "%s: Error writing to text: ", prog);
-                        	perror("");
-                        	exit(errno);
-                	}
+				fprintf(stderr, "%s: Error writing to text: ", prog);
+				perror("");
+				exit(errno);
+			}
 		} else if ( l == 3 ) {
 			if ( fputs(text3, fpt) == EOF ) {
-                        	fprintf(stderr, "%s: Error writing to text: ", prog);
-                        	perror("");
-                        	exit(errno);
-                	}
+				fprintf(stderr, "%s: Error writing to text: ", prog);
+				perror("");
+				exit(errno);
+			}
 		} else {
 			fprintf(stderr, "%s: Error writing to text: ", prog);
 			exit(2);
@@ -276,15 +276,15 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 		data_file_size = ftello(fpd); /* Sets file size equal to current offset */
 		if ( data_file_size == -1 ) {
 			fprintf(stderr, "%s: Error getting file size of data: ", prog);
-        	        perror("");
-        	        exit(errno);
+			perror("");
+			exit(errno);
 		}
 		
 		if ( fseek(fpd, 0L, SEEK_SET) ) { /* seek to beginning of file */
-        	        fprintf(stderr, "%s: Error getting file size of data: ", prog);
-        	        perror("");
-        	        exit(errno);
-        	}
+			fprintf(stderr, "%s: Error getting file size of data: ", prog);
+			perror("");
+			exit(errno);
+		}
 
 		if ( data_file_size == 0 ) {
 			fprintf(stderr, "%s: Size of data file is zero, no data to encode\n", prog);
@@ -297,34 +297,34 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 		/* buffer data into memory if data is being read from a tty */
 
 		/* allocate memory for data */
-        	if ( (data_ptr = (char*) calloc(n, sizeof(char))) == NULL ) {
-        	        fprintf(stderr, "%s: error allocating memory: ", prog);
-        	        perror("");
-        	        exit(errno);
-        	}
+		if ( (data_ptr = (char*) calloc(n, sizeof(char))) == NULL ) {
+			fprintf(stderr, "%s: error allocating memory: ", prog);
+			perror("");
+			exit(errno);
+		}
 
 		/* copy data into memory */
 		while (1) {
 			c = fgetc(fpd);
 			if ( ferror(fpd) ) {
 				fprintf(stderr, "%s: error allocating memory: ", prog);
-                                perror("");
-                                exit(errno);
+				perror("");
+				exit(errno);
 			}
 			if ( feof(fpd) ) {
 				break;
 			}
-                	if (i == n) { /* allocates more memory */
-                	        n = n + 32;
-                	        data_ptr = reallocarray(data_ptr, n, sizeof(char));
-                	        if (data_ptr == NULL) {
-                	                fprintf(stderr, "%s: error allocating memory: ", prog);
-                	                perror("");
-                	                exit(errno);
-                	        }
-                	}
-                	data_ptr[i] = c;
-                	++i;
+			if (i == n) { /* allocates more memory */
+				n = n + 32;
+				data_ptr = reallocarray(data_ptr, n, sizeof(char));
+				if (data_ptr == NULL) {
+					fprintf(stderr, "%s: error allocating memory: ", prog);
+					perror("");
+					exit(errno);
+				}
+			}
+			data_ptr[i] = c;
+			++i;
 		}
 		
 		data_file_size = i;
@@ -400,15 +400,15 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 	/* output one character from message and magic number */
 	static const char magic[] = {0xe2, 0x80, 0x8b, 0xcd, 0x8f, 0};
 	char_size = checkbytes(ptr[i]);
-        for ( x = 1; x <= char_size; ++x ) {
-                if ( fputc(ptr[i], fpt) == EOF ) {
-                        fprintf(stderr, "%s: Error writing to text: ", prog);
-                        perror("");
-                        exit(errno);
-                }
-                ++i;
-        }
-        ++n;
+	for ( x = 1; x <= char_size; ++x ) {
+		if ( fputc(ptr[i], fpt) == EOF ) {
+			fprintf(stderr, "%s: Error writing to text: ", prog);
+			perror("");
+			exit(errno);
+		}
+		++i;
+	}
+	++n;
 	if ( fputs(magic, fpt) == EOF ) {
 		fprintf(stderr, "%s: Error writing to text: ", prog);
 		perror("");
@@ -450,13 +450,13 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 				data = fgetc(fpd);
 
 				if ( ferror(fpd) ) {
-                		        fprintf(stderr, "%s: Error reading data stream: ", prog);
-                		        perror("");
-                		        exit(errno);
-                		}
-                		if ( feof(fpd) ) {
-                		        break;
-                		}
+					fprintf(stderr, "%s: Error reading data stream: ", prog);
+					perror("");
+					exit(errno);
+				}
+				if ( feof(fpd) ) {
+					break;
+				}
 
 				/* update md5 */
 				if ( !MD5_Update(&context, &data, 1) ) {
@@ -479,9 +479,9 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 
 			/* output delimiter to signal end of data and start of checksum */
 			 if ( fputs(text4, fpt) == EOF ) {
-                         	fprintf(stderr, "%s: Error writing to text: ", prog);
-                         	perror("");
-                         	exit(errno);
+				fprintf(stderr, "%s: Error writing to text: ", prog);
+				perror("");
+				exit(errno);
 			 }
 
 			for (x = 0; x < MD5_DIGEST_LENGTH; ++x)
@@ -489,9 +489,9 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 
 			/* output delimiter to signal end of checksum */
 			 if ( fputs(text4, fpt) == EOF ) {
-                         	fprintf(stderr, "%s: Error writing to text: ", prog);
-                         	perror("");
-                         	exit(errno);
+				fprintf(stderr, "%s: Error writing to text: ", prog);
+				perror("");
+				exit(errno);
 			 }
 
 		}
@@ -548,11 +548,11 @@ void decode_data(FILE *fpd, FILE *fpt)
 
 		unsigned char c;
 		/* allocate memory for text */
-        	if ( (text_ptr = (unsigned char*) calloc(n, sizeof(unsigned char))) == NULL ) {
-        	        fprintf(stderr, "%s: error allocating memory: ", prog);
-        	        perror("");
-        	        exit(errno);
-        	}
+		if ( (text_ptr = (unsigned char*) calloc(n, sizeof(unsigned char))) == NULL ) {
+			fprintf(stderr, "%s: error allocating memory: ", prog);
+			perror("");
+			exit(errno);
+		}
 
 		/* copy text into memory */
 		i = 0;
@@ -560,23 +560,23 @@ void decode_data(FILE *fpd, FILE *fpt)
 			c = fgetc(fpt);
 			if ( ferror(fpt) ) {
 				fprintf(stderr, "%s: error allocating memory: ", prog);
-                                perror("");
-                                exit(errno);
+				perror("");
+				exit(errno);
 			}
 			if ( feof(fpt) ) {
 				break;
 			}
-                	if (i == n) { /* allocates more memory */
-                	        n = n + 32;
-                	        text_ptr = reallocarray(text_ptr, n, sizeof(unsigned char));
-                	        if (text_ptr == NULL) {
-                	                fprintf(stderr, "%s: error allocating memory: ", prog);
-                	                perror("");
-                	                exit(errno);
-                	        }
-                	}
-                	text_ptr[i] = c;
-                	++i;
+			if (i == n) { /* allocates more memory */
+				n = n + 32;
+				text_ptr = reallocarray(text_ptr, n, sizeof(unsigned char));
+				if (text_ptr == NULL) {
+					fprintf(stderr, "%s: error allocating memory: ", prog);
+					perror("");
+					exit(errno);
+				}
+			}
+			text_ptr[i] = c;
+			++i;
 		}
 
 		text_file_size = i;
