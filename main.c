@@ -11,7 +11,7 @@
  * 		1: magic number found
  * 		0: no magic numbers found
  */
-int magic_number_present(FILE *fp);
+int is_magic_number_present(FILE *fp);
 
 /* 
  * Encodes data into message and writes it to text
@@ -42,6 +42,9 @@ int checkbit(char data, int bit);
  * Returns: number of bits set
  */
 int checkbytes(char data);
+
+/* Takes byte of data and outputs it to stream as utf-8 characters */
+void output_byte_to_utf8_stream(unsigned char data, FILE *fpt);
 
 char *prog;
 int verbose = 0;
@@ -151,7 +154,7 @@ int main(int argc, char *argv[])
 		/* check magic numbers */
 		if (verbose > 1)
 			fprintf(stderr, "%s: Checking magic numbers...\n", prog);
-		if ( magic_number_present(fpt) ) {
+		if ( is_magic_number_present(fpt) ) {
 			decode_data(fpd, fpt);
 		} else {
 			fprintf(stderr, "%s: text stream does not contain magic numbers\n", prog);
@@ -166,7 +169,7 @@ int main(int argc, char *argv[])
 	exit(0);
 }
 
-int magic_number_present(FILE *fp)
+int is_magic_number_present(FILE *fp)
 {
 	int i = 0, j = 0;
 	unsigned char data;
@@ -207,6 +210,50 @@ int magic_number_present(FILE *fp)
 	}
 	return 0;
 
+}
+
+void output_byte_to_utf8_stream(unsigned char data, FILE *fpt)
+{
+	static const char text0[4] = {0xe2, 0x80, 0x8b, 0};
+	static const char text1[4] = {0xe2, 0x80, 0x8c, 0};
+	static const char text2[4] = {0xe2, 0x80, 0x8d, 0};
+	static const char text3[4] = {0xe2, 0x81, 0xa0, 0};
+	
+	int l;
+	
+	/* encode data */
+	for ( int m = 3; m >= 0; --m ) {
+		l = (data >> (m*2)) & 3;
+		if ( l == 0 ) {
+			if ( fputs(text0, fpt) == EOF ) {
+                        	fprintf(stderr, "%s: Error writing to text: ", prog);
+                        	perror("");
+                        	exit(errno);
+                	}
+		} else if ( l == 1 ) {
+			if ( fputs(text1, fpt) == EOF ) {
+                        	fprintf(stderr, "%s: Error writing to text: ", prog);
+                        	perror("");
+                        	exit(errno);
+                	}
+		} else if ( l == 2 ) {
+			if ( fputs(text2, fpt) == EOF ) {
+                        	fprintf(stderr, "%s: Error writing to text: ", prog);
+                        	perror("");
+                        	exit(errno);
+                	}
+		} else if ( l == 3 ) {
+			if ( fputs(text3, fpt) == EOF ) {
+                        	fprintf(stderr, "%s: Error writing to text: ", prog);
+                        	perror("");
+                        	exit(errno);
+                	}
+		} else {
+			fprintf(stderr, "%s: Error writing to text: ", prog);
+			exit(2);
+		}
+
+	}
 }
 
 void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
@@ -375,14 +422,8 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 
 	/* boolean for whether or not the checksum has been outputted */
 	int checksum_outputted = 0;
-
-	const char text0[4] = {0xe2, 0x80, 0x8b, 0};
-	const char text1[4] = {0xe2, 0x80, 0x8c, 0};
-	const char text2[4] = {0xe2, 0x80, 0x8d, 0};
-	const char text3[4] = {0xe2, 0x81, 0xa0, 0};
-	const char text4[3] = {0xcd, 0x8f, 0};
-	int l;
-	int m;
+	
+	const char text4[3] = {0xcd, 0x8f, 0}; //delimiter
 	while ( n < number_of_characters ) {
 		if (data_file_size != 0) {
 			/* output data as utf8 characters */
@@ -401,38 +442,7 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 				}
 				
 				/* encode data */
-				for ( m = 3; m >= 0; --m ) {
-					l = (data >> (m*2)) & 3;
-					if ( l == 0 ) {
-						if ( fputs(text0, fpt) == EOF ) {
-                	                        	fprintf(stderr, "%s: Error writing to text: ", prog);
-                	                        	perror("");
-                	                        	exit(errno);
-                	                	}
-					} else if ( l == 1 ) {
-						if ( fputs(text1, fpt) == EOF ) {
-                	                        	fprintf(stderr, "%s: Error writing to text: ", prog);
-                	                        	perror("");
-                	                        	exit(errno);
-                	                	}
-					} else if ( l == 2 ) {
-						if ( fputs(text2, fpt) == EOF ) {
-                	                        	fprintf(stderr, "%s: Error writing to text: ", prog);
-                	                        	perror("");
-                	                        	exit(errno);
-                	                	}
-					} else if ( l == 3 ) {
-						if ( fputs(text3, fpt) == EOF ) {
-                	                        	fprintf(stderr, "%s: Error writing to text: ", prog);
-                	                        	perror("");
-                	                        	exit(errno);
-                	                	}
-					} else {
-						fprintf(stderr, "%s: Error writing to text: ", prog);
-						exit(2);
-					}
-
-				}
+				output_byte_to_utf8_stream(data, fpt);
 				++j;
 			}
 		} else {
@@ -454,38 +464,7 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 					exit(2);
 				}
 
-                                for ( m = 3; m >= 0; --m ) {
-                                        l = (data >> (m*2)) & 3;
-                                        if ( l == 0 ) {
-                                                if ( fputs(text0, fpt) == EOF ) {
-                                                        fprintf(stderr, "%s: Error writing to text: ", prog);
-                                                        perror("");
-                                                        exit(errno);
-                                                }
-                                        } else if ( l == 1 ) {
-                                                if ( fputs(text1, fpt) == EOF ) {
-                                                        fprintf(stderr, "%s: Error writing to text: ", prog);
-                                                        perror("");
-                                                        exit(errno);
-                                                }
-                                        } else if ( l == 2 ) {
-                                                if ( fputs(text2, fpt) == EOF ) {
-                                                        fprintf(stderr, "%s: Error writing to text: ", prog);
-                                                        perror("");
-                                                        exit(errno);
-                                                }
-                                        } else if ( l == 3 ) {
-                                                if ( fputs(text3, fpt) == EOF ) {
-                                                        fprintf(stderr, "%s: Error writing to text: ", prog);
-                                                        perror("");
-                                                        exit(errno);
-                                                }
-                                        } else {
-                                                fprintf(stderr, "%s: Error writing to text: ", prog);
-                                                exit(2);
-                                        }
-
-                                }	
+				output_byte_to_utf8_stream(data, fpt);
 			}
 		}
 
@@ -505,40 +484,8 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
                          	exit(errno);
 			 }
 
-			for (x = 0; x < MD5_DIGEST_LENGTH; ++x) {
-				for ( m = 3; m >= 0; --m ) {
-                        	        l = (digest[x] >> (m*2)) & 3;
-                        	        if ( l == 0 ) {
-                        	                if ( fputs(text0, fpt) == EOF ) {
-                        	                        fprintf(stderr, "%s: Error writing to text: ", prog);
-                        	                        perror("");
-                        	                        exit(errno);
-                        	                }
-                        	        } else if ( l == 1 ) {
-                        	                if ( fputs(text1, fpt) == EOF ) {
-                        	                        fprintf(stderr, "%s: Error writing to text: ", prog);
-                        	                        perror("");
-                        	                        exit(errno);
-                        	                }
-                        	        } else if ( l == 2 ) {
-                        	                if ( fputs(text2, fpt) == EOF ) {
-                        	                        fprintf(stderr, "%s: Error writing to text: ", prog);
-                        	                        perror("");
-                        	                        exit(errno);
-                        	                }
-                        	        } else if ( l == 3 ) {
-                        	                if ( fputs(text3, fpt) == EOF ) {
-                        	                        fprintf(stderr, "%s: Error writing to text: ", prog);
-                        	                        perror("");
-                        	                        exit(errno);
-                        	                }
-                        	        } else {
-                        	                fprintf(stderr, "%s: Error writing to text: ", prog);
-                        	                exit(2);
-                        	        }
-                        	                                                                              
-                        	}
-			}
+			for (x = 0; x < MD5_DIGEST_LENGTH; ++x)
+				output_byte_to_utf8_stream(digest[x], fpt);
 
 			/* output delimiter to signal end of checksum */
 			 if ( fputs(text4, fpt) == EOF ) {
