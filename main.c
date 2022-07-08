@@ -46,6 +46,13 @@ int checkbytes(char data);
 /* Takes byte of data and outputs it to stream as utf-8 characters */
 void output_byte_to_utf8_stream(unsigned char data, FILE *fpt);
 
+/*
+ * Buffers stream into memory
+ * Arguments: file stream to read from, pointer to allocated memory
+ * Returns: size of buffered stream
+ */
+size_t buffer_stream_into_memory(FILE *fp, unsigned char **ptr);
+
 char *prog;
 int verbose = 0;
 int main(int argc, char *argv[])
@@ -260,10 +267,8 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 {
 	off_t data_file_size = 0;
 	int data_from_tty = 0;
-	char *data_ptr;
-
-	size_t i = 0, n = 32;
-	char c;
+	unsigned char *data_ptr;
+	const size_t initial_buffer_size = 1024;
 
 	if (fpd != stdin) {
 		/* check size of data file */
@@ -297,37 +302,14 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 		/* buffer data into memory if data is being read from a tty */
 
 		/* allocate memory for data */
-		if ( (data_ptr = (char*) calloc(n, sizeof(char))) == NULL ) {
+		if ( (data_ptr = (unsigned char*) calloc(initial_buffer_size, sizeof(unsigned char))) == NULL ) {
 			fprintf(stderr, "%s: error allocating memory: ", prog);
 			perror("");
 			exit(errno);
 		}
 
 		/* copy data into memory */
-		while (1) {
-			c = fgetc(fpd);
-			if ( ferror(fpd) ) {
-				fprintf(stderr, "%s: error allocating memory: ", prog);
-				perror("");
-				exit(errno);
-			}
-			if ( feof(fpd) ) {
-				break;
-			}
-			if (i == n) { /* allocates more memory */
-				n = n + 32;
-				data_ptr = reallocarray(data_ptr, n, sizeof(char));
-				if (data_ptr == NULL) {
-					fprintf(stderr, "%s: error allocating memory: ", prog);
-					perror("");
-					exit(errno);
-				}
-			}
-			data_ptr[i] = c;
-			++i;
-		}
-		
-		data_file_size = i;
+		data_file_size = buffer_stream_into_memory(fpd, &data_ptr);
 
 		if ( data_file_size == 0 ) {
 			fprintf(stderr, "%s: No data to encode", prog);
@@ -339,36 +321,21 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 	}
 
 	
-	i = 0;
-	n = 32;
 	/* allocate memory for message */
-	char *ptr;
-	if ( (ptr = (char*) calloc(n, sizeof(char))) == NULL ) {
+	unsigned char *msg_ptr;
+	if ( (msg_ptr = (unsigned char*) calloc(initial_buffer_size, sizeof(unsigned char))) == NULL ) {
 		fprintf(stderr, "%s: error allocating memory: ", prog);
 		perror("");
 		exit(errno);
 	}
 
 	/* copy message into memory */
-	while ( (c = fgetc(fpm)) != EOF ) {
-		if (i == n) { /* allocates more memory */
-			n = n + 32;
-			ptr = reallocarray(ptr, n, sizeof(char));
-			if (ptr == NULL) {
-				fprintf(stderr, "%s: error allocating memory: ", prog);
-				perror("");
-				exit(errno);
-			}
-		}
-		ptr[i] = c;
-		++i;
-	}
+	buffer_stream_into_memory(fpm, &msg_ptr);
 
 	/* count number of characters in message */
-	i = 0;
-	n = 0;
-	while ( ptr[i] != 0 ) {
-		i = i + checkbytes(ptr[i]);
+	size_t i = 0, n = 0;
+	while ( msg_ptr[i] != 0 ) {
+		i = i + checkbytes(msg_ptr[i]);
 		n = n + 1;
 	}
 	if ( n < 3 ) {
@@ -399,9 +366,9 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 
 	/* output one character from message and magic number */
 	static const char magic[] = {0xe2, 0x80, 0x8b, 0xcd, 0x8f, 0};
-	char_size = checkbytes(ptr[i]);
+	char_size = checkbytes(msg_ptr[i]);
 	for ( x = 1; x <= char_size; ++x ) {
-		if ( fputc(ptr[i], fpt) == EOF ) {
+		if ( fputc(msg_ptr[i], fpt) == EOF ) {
 			fprintf(stderr, "%s: Error writing to text: ", prog);
 			perror("");
 			exit(errno);
@@ -497,9 +464,9 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 		}
 
 		/* output one character from message */
-		char_size = checkbytes(ptr[i]);
+		char_size = checkbytes(msg_ptr[i]);
 		for ( x = 1; x <= char_size; ++x ) {
-			if ( fputc(ptr[i], fpt) == EOF ) {
+			if ( fputc(msg_ptr[i], fpt) == EOF ) {
 				fprintf(stderr, "%s: Error writing to text: ", prog);
 				perror("");
 				exit(errno);
@@ -510,7 +477,7 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 
 	}
 
-	free(ptr);
+	free(msg_ptr);
 	if (data_from_tty) {
 		free(data_ptr);
 	}
@@ -522,6 +489,37 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 		fprintf(stderr, "\n");
 	}
 
+}
+
+size_t buffer_stream_into_memory(FILE *fp, unsigned char **ptr)
+{
+	unsigned char c;
+	size_t i = 0, n = 1024;
+	/* copy data into memory */
+	while (1) {
+		c = fgetc(fp);
+		if ( ferror(fp) ) {
+			fprintf(stderr, "%s: error allocating memory: ", prog);
+			perror("");
+			exit(errno);
+		}
+		if ( feof(fp) ) {
+			break;
+		}
+		if (i == n) { /* allocates more memory */
+			n = n + 1024;
+			*ptr = reallocarray(*ptr, n, sizeof(unsigned char));
+			if (*ptr == NULL) {
+				fprintf(stderr, "%s: error allocating memory: ", prog);
+				perror("");
+				exit(errno);
+			}
+		}
+		*(*ptr+i) = c;
+		++i;
+	}
+
+	return i;
 }
 
 void decode_data(FILE *fpd, FILE *fpt)
