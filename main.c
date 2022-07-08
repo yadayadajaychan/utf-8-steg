@@ -4,6 +4,9 @@
 #include <unistd.h>
 #include <openssl/md5.h>
 
+#define INITIAL_BUFFER_SIZE 1024
+#define BUFFER_INCREMENT 1024
+
 /* 
  * Parses through the first 9 bytes of stream for magic number (does not reset stream)
  * Arguments: file pointer
@@ -268,7 +271,6 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 	off_t data_file_size = 0;
 	int data_from_tty = 0;
 	unsigned char *data_ptr;
-	const size_t initial_buffer_size = 1024;
 
 	if (fpd != stdin) {
 		/* check size of data file */
@@ -302,7 +304,7 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 		/* buffer data into memory if data is being read from a tty */
 
 		/* allocate memory for data */
-		if ( (data_ptr = (unsigned char*) calloc(initial_buffer_size, sizeof(unsigned char))) == NULL ) {
+		if ( (data_ptr = (unsigned char*) calloc(INITIAL_BUFFER_SIZE, sizeof(unsigned char))) == NULL ) {
 			fprintf(stderr, "%s: error allocating memory: ", prog);
 			perror("");
 			exit(errno);
@@ -323,7 +325,7 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 	
 	/* allocate memory for message */
 	unsigned char *msg_ptr;
-	if ( (msg_ptr = (unsigned char*) calloc(initial_buffer_size, sizeof(unsigned char))) == NULL ) {
+	if ( (msg_ptr = (unsigned char*) calloc(INITIAL_BUFFER_SIZE, sizeof(unsigned char))) == NULL ) {
 		fprintf(stderr, "%s: error allocating memory: ", prog);
 		perror("");
 		exit(errno);
@@ -494,7 +496,7 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 size_t buffer_stream_into_memory(FILE *fp, unsigned char **ptr)
 {
 	unsigned char c;
-	size_t i = 0, n = 1024;
+	size_t i = 0, n = INITIAL_BUFFER_SIZE;
 	/* copy data into memory */
 	while (1) {
 		c = fgetc(fp);
@@ -507,7 +509,7 @@ size_t buffer_stream_into_memory(FILE *fp, unsigned char **ptr)
 			break;
 		}
 		if (i == n) { /* allocates more memory */
-			n = n + 1024;
+			n = n + BUFFER_INCREMENT;
 			*ptr = reallocarray(*ptr, n, sizeof(unsigned char));
 			if (*ptr == NULL) {
 				fprintf(stderr, "%s: error allocating memory: ", prog);
