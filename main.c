@@ -298,9 +298,9 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 			exit(1);
 		}
 		if (verbose > 1)
-			fprintf(stderr, "%s: Data size: %i\n", prog, data_file_size);
+			fprintf(stderr, "%s: Data size: %li\n", prog, data_file_size);
 
-	} else if ( data_from_tty = isatty(fileno(fpd)) ) {
+	} else if ((data_from_tty = isatty(fileno(fpd)))) {
 		/* buffer data into memory if data is being read from a tty */
 
 		/* allocate memory for data */
@@ -318,7 +318,7 @@ void encode_data(FILE *fpm, FILE *fpd, FILE *fpt)
 			exit(1);
 		}
 		if (verbose > 1)
-			fprintf(stderr, "%s: Data size: %i\n", prog, data_file_size);
+			fprintf(stderr, "%s: Data size: %li\n", prog, data_file_size);
 		
 	}
 
@@ -543,7 +543,7 @@ void decode_data(FILE *fpd, FILE *fpt)
 	int text_is_from_tty;
 	unsigned char *text_ptr;
 	off_t text_file_size = 0;
-	if ( text_is_from_tty = isatty(fileno(fpt)) ) {
+	if ((text_is_from_tty = isatty(fileno(fpt)))) {
 
 		/* allocate memory for text */
 		if ( (text_ptr = (unsigned char*) calloc(INITIAL_BUFFER_SIZE, sizeof(unsigned char))) == NULL ) {
@@ -560,7 +560,7 @@ void decode_data(FILE *fpd, FILE *fpt)
 			exit(1);
 		}
 		if (verbose > 1)
-			fprintf(stderr, "%s: Text size: %i\n", prog, text_file_size);
+			fprintf(stderr, "%s: Text size: %li\n", prog, text_file_size);
 
 	}
 
