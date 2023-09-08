@@ -1,7 +1,10 @@
 # utf-8-steg
 encodes/decodes data into zero-width utf-8 characters
 
-This is currently an early prototype and needs a lot of polishing
+## Notice: unmaintained
+
+This program has been superceded by https://github.com/yadayadajaychan/zwc
+
 ## Demo
 t​͏‌⁠‌​r‌‍‍​y‌‍‍‌ ‌⁠​⁠u​‍​​s‌‍‍‌i‌⁠​⁠n​‍​​g‌‍​‌ ​‍​​t‌⁠​⁠h‌‍‌‌i‌‍​⁠s‌⁠​‍ ‌‍‌‌p‌⁠‌​r​‍​​o‌‍⁠‌g‌‍‌‌r‌⁠​⁠a‌⁠​⁠m‌‍​‌ ‌‍‌⁠t‌‍‌‌o​​‍‍͏‍‌⁠​⁠⁠‍‌‌‌⁠‍⁠‍‍​​⁠‍‌⁠‌‍‌‍‍‌‍⁠​‌‍‌‌⁠‍⁠‌‌‍⁠‌‍​​‌⁠⁠‍​‍‌​‍‍⁠‌‍​‌​​⁠‌͏ decode the data hidden in this message
 
